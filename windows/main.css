@@ -3371,7 +3371,8 @@ table td {
 }
 
 .recent-posts__title a {
-    color: var(--heading-font-color)
+    color: var(--heading-font-color);
+    font-weight: bold;
 }
 
 .recent-posts__title a:hover {

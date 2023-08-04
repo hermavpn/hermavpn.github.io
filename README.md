@@ -1,2 +1,2 @@
 # hermavpn.github.io
-VPN
+Virtual Private Network 

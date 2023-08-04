@@ -72,7 +72,7 @@
     src: url('../fonts/IRANSansX-Thin.ttf') format('truetype');
 }
 
-p, h1, h2, h3, h4, h5, h6, a, .subscribe-button, .subscribe__description {
+p, h1, h2, h3, h4, h5, h6, a, .subscribe-button, .subscribe__description, input {
     font-family: 'IRANSans', sans-serif;
 }
 

@@ -59,21 +59,25 @@
 
 @font-face {
     font-family: 'IRANSans';
-    src: url('fonts/IRANSansX-Regular.ttf') format('truetype');
+    src: url('../fonts/IRANSansX-Regular.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'IRANSans-bold';
-    src: url('fonts/IRANSansX-Bold.ttf') format('truetype');
+    src: url('../fonts/IRANSansX-Bold.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'IRANSans-thin';
-    src: url('fonts/IRANSansX-Thin.ttf') format('truetype');
+    src: url('../fonts/IRANSansX-Thin.ttf') format('truetype');
 }
 
-p {
+p, h1, h2, h3, h4, h5, h6, a, .subscribe-button, .subscribe__description {
     font-family: 'IRANSans', sans-serif;
+}
+
+.title{
+    font-weight: bolder;
 }
 
 .iran_bold {
@@ -5079,4 +5083,44 @@ table td {
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.custom-video-controls {
+    position: relative;
+}
+
+.progress-bar-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar {
+    width: 0;
+    height: 5px;
+    background-color: #e40d75;
+}
+
+.fullscreen-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-download {
+    background-color: #ff009f;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.btn-download:hover {
+    background-color: #e6008f;
 }

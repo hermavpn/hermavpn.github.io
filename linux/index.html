@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>HermaVPN | آموزش نصب لینوکس</title>
+    <meta name='description'
+          content='HermaVPN | آموزش نصب لینوکس'>
+
+    <link rel="canonical" href="index.html">
+    <link rel="alternate" type="application/rss+xml" title="HermaVPN" href="../feed.xml">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/">
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+          as="style">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+
+    <!-- Ionicons -->
+    <link rel="preload" href="../../unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" as="style">
+
+    <link href="../../unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" rel="stylesheet">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+    <script>
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.setAttribute("dark", "");
+            document.documentElement.classList.add('dark-mode');
+        }
+
+    </script>
+</head>
+
+<body dir="rtl">
+
+
+<!-- begin global wrap -->
+<div class="global-wrap">
+
+    <!-- begin header -->
+    <header class="header">
+        <div class="container">
+            <div class="row">
+                <div class="header__inner col col-12">
+
+                    <div class="logo">
+                        <a class="logo__link" href="../index.html">
+
+                            HermaVPN | فیلترشکن هرما
+
+                        </a>
+                    </div>
+
+                    <div class="hamburger">
+                        <div></div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- end header -->
+
+    <!-- begin content -->
+    <main class="content" aria-label="Content">
+        <!-- begin hero -->
+        <section class="hero hero-video">
+            <div class="container">
+                <div class="row">
+                    <div class="col col-12">
+                        <div class="hero__inner">
+                            <div class="hero__right">
+
+
+                                <div class="post-tags">
+                                    <a href="/android/index.html" class="post-tag">لینوکس</a>
+                                </div>
+
+
+                                <h1 class="hero__title"> آموزش راه اندازی فیلترشکن لینوکس</h1>
+
+
+                                <div class="hero__right">
+
+                                    <div class="post-video">
+                                        <div class="video-icon">
+                                            <div class="circle pulse"></div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                                <polygon points="40,30 65,50 40,70"></polygon>
+                                            </svg>
+                                        </div>
+                                        <div class="post-video__wrap">
+                                            <div class="custom-video-controls">
+                                                <video id="videoPlayer" width="100%" height="438px"
+                                                       poster="/images/HermaVPN.jpg">
+                                                    <source src="https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/videos/Hiddify-Linux.mp4"
+                                                            type="video/mp4">
+                                                </video>
+                                                <div class="progress-bar-container">
+                                                    <div class="progress-bar" id="progressBar"></div>
+                                                </div>
+                                                <i class="fas fa-expand fullscreen-btn" id="fullscreenBtn"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row spacer" style="margin-top: 70px;">
+                    <div class="col-md-12 text-center">
+                        <h1 class="title">دانلود برنامه</h1>
+                        <a href="https://github.com/hiddify/hiddify-next/releases/latest/download/hiddify-linux-x64.zip" target="_blank" class="btn-download">
+                            <i class="fas fa-download"></i> دانلود مستقیم
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="row max-1000" style="margin-top: 80px;">
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 1 -->
+                        <div class="col-item">
+                            <i class="fas fa-shield-alt fa-3x"></i>
+                            <h4>پروتکل اختصاصی</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 2 -->
+                        <div class="col-item">
+                            <i class="fas fa-money-bill-wave fa-3x"></i>
+                            <h4>قیمت پایین</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 3 -->
+                        <div class="col-item">
+                            <i class="fas fa-link fa-3x"></i>
+                            <h4>اتصال دو دستگاه همزمان</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row max-1000">
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 4 -->
+                        <div class="col-item">
+                            <i class="fas fa-network-wired fa-3x"></i>
+                            <h4>حجم نامحدود</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 5 -->
+                        <div class="col-item">
+                            <i class="fas fa-tachometer-alt fa-3x"></i>
+                            <h4>سرعت بالا</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Column 6 -->
+                        <div class="col-item">
+                            <i class="fas fa-globe fa-3x"></i>
+                            <h4>آی پی ثابت</h4>
+                        </div>
+                    </div>
+                </div>
+
+
+        </section>
+        <!-- end hero -->
+
+        <!-- begin post -->
+        <div class="container animate">
+            <article class="post">
+
+                <div class="post__content">
+
+                    <div class="row spacer">
+                        <div class="col-md-12">
+                            <h2 class="big-title">دستگاه های که قابل اتصال</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <!-- Card 1 -->
+                            <div class="card-item">
+                                <i class="fab fa-android fa-3x"></i>
+                                <h4><a href="/android/">لینوکس</a></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- Card 2 -->
+                            <div class="card-item">
+                                <i class="fab fa-apple fa-3x"></i>
+                                <h4><a href="/iphone/">آیفون</a></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- Card 3 -->
+                            <div class="card-item">
+                                <i class="fab fa-windows fa-3x"></i>
+                                <h4><a href="/windows/">ویندوز</a></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row spacer-top">
+                    <div class="col-md-12">
+                        <h3>اشتراک این صفحه در شبکه اجتماعی</h3>
+                    </div>
+                </div>
+                <div class="post__share">
+                    <ul class="share__list list-reset">
+                        <li class="share__item">
+                            <a class="share__link share__twitter"
+                               href="https://twitter.com/intent/tweet?text=https://hermavpn.github.io"
+                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+                               title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
+                        </li>
+                        <li class="share__item">
+                            <a class="share__link share__facebook"
+                               href="https://www.facebook.com/sharer/sharer.php?u=https://hermavpn.github.io"
+                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+                               title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
+                        </li>
+                        <li class="share__item">
+                            <a class="share__link share__pinterest"
+                               href="http://pinterest.com/pin/create/button/?url=https://hermavpn.github.io"
+                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+                               title="Share on Pinterest" rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
+                        </li>
+                        <li class="share__item">
+                            <a class="share__link share__linkedin"
+                               href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://hermavpn.github.io"
+                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+                               title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- begin comments -->
+                <div class="show-comments">
+                    <button class="button button--rounded disqus-button" id="show-comments-button"
+                            onclick="disqus();return false;">نمایش نظرات
+                    </button>
+                </div>
+
+                <div id="disqus_thread" class="post__comments">
+                    <div id="disqus_empty"></div>
+                </div>
+
+                <script>
+                    var disqus_loaded = false;
+                    var disqus_shortname = 'anvod-studio-test';
+                    var disqus_container = document.getElementById("disqus_thread");
+
+                    function disqus() {
+                        if (!disqus_loaded) {
+                            disqus_loaded = true;
+                            var e = document.createElement("script");
+                            e.type = "text/javascript";
+                            e.async = true;
+                            e.src = "//" + disqus_shortname + ".disqus.com/embed.js";
+                            (document.getElementsByTagName("head")[0] ||
+                                document.getElementsByTagName("body")[0])
+                                .appendChild(e);
+                            // Hide the button after opening
+                            document.getElementById("show-comments-button").style.display = "none";
+                            // Show disqus comments
+                            disqus_container.classList.add("is-open");
+                        }
+                    }
+                </script>
+
+                <noscript>Please enable JavaScript to view the
+                    <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+                </noscript>
+                <!-- end comments -->
+
+
+            </article>
+        </div>
+        <!-- end post -->
+
+    </main>
+    <!-- end content -->
+
+    <div class="top" title="Top"><i class="ion ion-md-arrow-round-up"></i></div>
+
+    <!-- begin footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col col-12 col-m-12">
+                    <div class="footer__inner">
+                        <div class="footer__head">
+                            <div class="row">
+
+                                <div class="col col-6 col-d-6 col-t-12">
+                                    <div class="widget widget-subscribe">
+                                        <div class="widget__head">
+                                            <h3 class="widget__title">عضویت در خبرنامه</h3>
+                                        </div>
+                                        <div class="subscribe__inner">
+                                            <div class="subscribe__group">
+                                                <div class="subscribe__description">از آموزش های جدید با خبر باشید
+                                                </div>
+                                            </div>
+                                            <form class="subscribe-form validate"
+                                                  action="http://frnla.us6.list-manage.com/subscribe/post?u=6314d69a3f315af7ce3fb00a0&amp;id=3038727cc3"
+                                                  method="POST" id="membedded-subscribe-form"
+                                                  name="membedded-subscribe-form" target="_blank" novalidate>
+                                                <label class="screen-reader-text" for="mce-EMAIL">آدرس ایمیل</label>
+                                                <input class="subscribe-email required email" id="mce-EMAIL"
+                                                       type="text" name="EMAIL" placeholder="آدرس ایمیل شما">
+                                                <button class="button button--rounded subscribe-button"
+                                                        id="membedded-subscribe" type="submit"
+                                                        name="subscribe">عضویت
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col col-4 col-d-6 col-t-12">
+                                    <div class="widget widget-recent">
+                                        <div class="widget__head">
+                                            <h3 class="widget__title">آموزش های اخیر</h3>
+                                        </div>
+
+                                        <div class="recent-posts">
+
+                                            <a class="recent-posts__image"
+                                               href="/android/">
+
+                                                <div class="video-icon">
+                                                    <div class="circle pulse"></div>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                                        <polygon points="40,30 65,50 40,70"></polygon>
+                                                    </svg>
+                                                </div>
+
+                                                <img class="lazy" data-src="/images/HermaVPN.jpg"
+                                                     alt="android">
+                                            </a>
+
+                                            <div class="recent-posts__content">
+                                                <div class="recent-posts__date">
+                                                </div>
+                                                <h4 class="recent-posts__title"><a
+                                                        href="/android/index.html">آموزش نصب فیلترشکن در لینوکس</a>
+                                                </h4>
+                                            </div>
+                                        </div>
+
+                                        <div class="recent-posts">
+
+                                            <a class="recent-posts__image"
+                                               href="/android/index.html">
+
+
+                                                <div class="video-icon">
+                                                    <div class="circle pulse"></div>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                                        <polygon points="40,30 65,50 40,70"></polygon>
+                                                    </svg>
+                                                </div>
+
+                                                <img class="lazy" data-src="/images/HermaVPN.jpg"
+                                                     alt="iphone">
+                                            </a>
+
+                                            <div class="recent-posts__content">
+                                                <div class="recent-posts__date">
+                                                </div>
+                                                <h4 class="recent-posts__title"><a
+                                                        href="/android/index.html">آموزش نصب فیلترشکن در آیفون</a></h4>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer__info">
+            <div class="container">
+                <div class="row">
+                    <div class="col col-12">
+
+                        <div class="social">
+                            <ul class="social__list list-reset">
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://twitter.com/" target="_blank"
+                                       rel="noopener" aria-label="Twitter link"><i
+                                            class="ion-logo-twitter"></i></a>
+                                </li>
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://github.com/" target="_blank"
+                                       rel="noopener" aria-label="Github link"><i class="ion-logo-github"></i></a>
+                                </li>
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://youtube.com/" target="_blank"
+                                       rel="noopener" aria-label="Youtube link"><i
+                                            class="ion-logo-youtube"></i></a>
+                                </li>
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://pinterest.com/" target="_blank"
+                                       rel="noopener" aria-label="Pinterest link"><i
+                                            class="ion-logo-pinterest"></i></a>
+                                </li>
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://codepen.io/" target="_blank"
+                                       rel="noopener" aria-label="Codepen link"><i
+                                            class="ion-logo-codepen"></i></a>
+                                </li>
+
+                                <li class="social__item">
+                                    <a class="social__link" href="https://vimeo.com/" target="_blank" rel="noopener"
+                                       aria-label="Vimeo link"><i class="ion-logo-vimeo"></i></a>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <div class="copyright">طراحی شده توسط تیم فیلترشکن هرما <a href="tg://HermaVPN_BoT">HermaVPN</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- end footer -->
+</div>
+<!-- end global wrap -->
+
+<script src="../js/scripts.js"></script>
+<script src="../js/common.js"></script>
+<script>
+    const videoPlayer = document.getElementById("videoPlayer");
+    const progressBar = document.getElementById("progressBar");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const videoIcon = document.getElementsByClassName("video-icon")[0];
+    let isFullscreen = false;
+
+    videoPlayer.addEventListener("click", toggleVideoControls);
+    fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+    function toggleVideoControls() {
+        videoPlayer.controls = !videoPlayer.controls;
+        if (videoPlayer.controls) {
+            progressBar.style.width = "0";
+        }
+        videoIcon.remove();
+    }
+
+    function toggleFullscreen() {
+        if (!isFullscreen) {
+            if (videoPlayer.requestFullscreen) {
+                videoPlayer.requestFullscreen();
+            } else if (videoPlayer.mozRequestFullScreen) { /* Firefox */
+                videoPlayer.mozRequestFullScreen();
+            } else if (videoPlayer.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                videoPlayer.webkitRequestFullscreen();
+            } else if (videoPlayer.msRequestFullscreen) { /* IE/Edge */
+                videoPlayer.msRequestFullscreen();
+            }
+            fullscreenBtn.classList.remove("fa-expand");
+            fullscreenBtn.classList.add("fa-compress");
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari & Opera */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+                document.msExitFullscreen();
+            }
+            fullscreenBtn.classList.remove("fa-compress");
+            fullscreenBtn.classList.add("fa-expand");
+        }
+        isFullscreen = !isFullscreen;
+    }
+
+    videoPlayer.addEventListener("timeupdate", updateProgressBar);
+
+    function updateProgressBar() {
+        const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+</script>
+</body>
+</html>

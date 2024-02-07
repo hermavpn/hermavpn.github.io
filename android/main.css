@@ -5087,6 +5087,16 @@ table td {
 
 .custom-video-controls {
     position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+}
+
+.custom-video-controls video{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .progress-bar-container {

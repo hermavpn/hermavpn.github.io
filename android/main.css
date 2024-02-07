@@ -4336,6 +4336,10 @@ table td {
     }
 }
 
+.post-video{
+    width: 92%;
+}
+
 .post-video,
 .page-video {
     border-radius: 24px;

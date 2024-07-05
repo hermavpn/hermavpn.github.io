@@ -19,15 +19,7 @@ SUBDOMAIN_ENDPOINT=$2
 
 if [ "$(id -u)" != "0" ];then
     printf "$RED"		"[X] Please run as ROOT..."
-    printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
-    exit 0
-elif [ -z "$1" ]; then
-    printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-    printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
-    exit 0
-elif [ -z "$2" ]; then
-    printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-    printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
+    printf "$GREEN"     "[*] sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
     exit 0
 else
     # update & upgrade & dist-upgrade
@@ -353,7 +345,6 @@ EOF
 }
 
 
-menu
 main
 logo
 
@@ -362,9 +353,27 @@ select opt in "Endpoint" "Entrypoint" Exit
 do
     case $opt in
         "Endpoint")
+            if [ -z "$1" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
+                exit 0
+            elif [ -z "$2" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
+                exit 0
+            fi
             printf "$GREEN"  "[*] Running Endpoint Tunnel..."
             endpoint;;
         "Entrypoint")
+            if [ -z "$1" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
+                exit 0
+            elif [ -z "$2" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
+                exit 0
+            fi
             printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
             entrypoint;;
         "Exit")

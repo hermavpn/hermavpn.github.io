@@ -26,7 +26,7 @@ else
     apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh ufw nano dnsutils openssl haproxy sniproxy socat 
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
@@ -78,6 +78,25 @@ logo ()
 
 entrypoint ()
 {
+    # Initialize hostname
+    if ! grep -q "entrypoint" /etc/hostname; then
+        echo "entrypoint" > /etc/hostname
+    fi
+
+    # add ufw rules
+    UFW_CHECK=$(ufw status | grep -m 1 '80' | awk '{print $1}')
+    if [ ! "$UFW_CHECK" == "53,80,443,8080/udp" ] ; then
+        ufw enable
+        ufw allow 53,80,443,8080/udp
+        ufw allow 22,80,443,8080/tcp
+        ufw deny out from any to 10.0.0.0/8
+        ufw deny out from any to 172.16.0.0/12
+        ufw deny out from any to 192.168.0.0/16
+        ufw deny out from any to 100.64.0.0/10
+        curl -sSL https://www.arvancloud.ir/en/ips.txt | awk '{print "ufw deny out from any to " $1}' | bash > /dev/null &
+        curl -sSL https://www.ipdeny.com/ipblocks/data/countries/ir.zone | awk '{print "ufw deny out from any to " $1}' | bash > /dev/null &
+    fi
+
     # install waterwall
     if [ ! -d "/usr/share/waterwall" ]; then
         local name="waterwall"
@@ -195,8 +214,14 @@ EOF
     fi
 }
 
+
 endpoint ()
 {
+    # Initialize hostname
+    if ! grep -q "entrypoint" /etc/hostname; then
+        echo "entrypoint" > /etc/hostname
+    fi
+
     # install waterwall
     if [ ! -d "/usr/share/waterwall" ]; then
         local name="waterwall"
@@ -317,8 +342,46 @@ EOF
     fi
 }
 
+
 main ()
 {
+    # Set Time Zone
+    timedatectl set-timezone Asia/Tehran
+
+    # resolv fixed
+    if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
+        echo "nameserver 1.1.1.1" > /etc/resolv.conf
+        echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+    fi
+
+    # apt fixed
+    if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
+        sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
+    fi
+
+    # Initialize SSH root Login
+    if ! grep -q "prohibit-password" /etc/ssh/sshd_config; then
+        sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config
+        service ssh restart;service sshd restart
+    fi
+
+    # Initialize fail2ban
+    if [ ! -f "/etc/fail2ban/jail.local" ]; then
+        cat > /etc/fail2ban/jail.local << EOF
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 10
+findtime = 60m
+bantime = 60m
+ignoreip = 127.0.0.1/8 ::1
+EOF
+        systemctl daemon-reload
+        systemctl enable fail2ban;systemctl start fail2ban
+    fi
+
     # install hermavpn
     if [ ! -d "/usr/share/hermavpn" ]; then
         local name="hermavpn"

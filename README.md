@@ -9,7 +9,7 @@ curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/herma
 ```
 ### Run Script
 ```
-sudo hermavpn $Endpoint $Entrypoint
+sudo hermavpn $Entrypoint $Endpoint
 ```
 
 [![Website](https://img.shields.io/badge/Website-000000?style=flat&logo=google-chrome&logoColor=white)](https://hermavpn.github.io)

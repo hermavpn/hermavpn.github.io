@@ -18,26 +18,26 @@ SUBDOMAIN_ENDPOINT=$2
 
 
 if [ "$(id -u)" != "0" ];then
-	printf "$RED"		"[X] Please run as ROOT..."
+    printf "$RED"		"[X] Please run as ROOT..."
     printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
-	exit 0
+    exit 0
 elif [ -z "$1" ]; then
     printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
     printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
-	exit 0
+    exit 0
 elif [ -z "$2" ]; then
     printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
     printf "$GREEN"     "sudo hermavpn \$ENDPOINT \$ENTRYPOINT"
-	exit 0
+    exit 0
 else
-	# update & upgrade & dist-upgrade
-	apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
+    # update & upgrade & dist-upgrade
+    apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
-	# init requirements
-	apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli
+    # init requirements
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli
     OS=`uname -m`
-	USERS=$(users | awk '{print $1}')
-	LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+    USERS=$(users | awk '{print $1}')
+    LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
     IP_SUBDOMAIN_ENDPOINT=$(dig -4 +short $SUBDOMAIN_ENDPOINT)
     IP_SUBDOMAIN_ENTRYPOINT=$(dig -4 +short $SUBDOMAIN_ENTRYPOINT)
     INTERFACE=$(ip r | head -1 | cut -d " " -f5)
@@ -87,15 +87,15 @@ logo ()
 entrypoint ()
 {
     # install waterwall
-	if [ ! -d "/usr/share/waterwall" ]; then
-		local name="waterwall"
-		wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
-		unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
-		chmod 755 /usr/share/$name/*
-		ln -fs /usr/share/$name/Waterwall /usr/bin/$name
-		chmod +x /usr/bin/$name
-		printf "$GREEN"  "[*] Success installing $name"
-	fi
+    if [ ! -d "/usr/share/waterwall" ]; then
+        local name="waterwall"
+        wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
+        unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
+        chmod 755 /usr/share/$name/*
+        ln -fs /usr/share/$name/Waterwall /usr/bin/$name
+        chmod +x /usr/bin/$name
+        printf "$GREEN"  "[*] Success installing $name"
+    fi
 
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
@@ -179,15 +179,15 @@ EOF
 endpoint ()
 {
     # install waterwall
-	if [ ! -d "/usr/share/waterwall" ]; then
-		local name="waterwall"
-		wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
-		unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
-		chmod 755 /usr/share/$name/*
-		ln -fs /usr/share/$name/Waterwall /usr/bin/$name
-		chmod +x /usr/bin/$name
-		printf "$GREEN"  "[*] Success installing $name"
-	fi
+    if [ ! -d "/usr/share/waterwall" ]; then
+        local name="waterwall"
+        wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
+        unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
+        chmod 755 /usr/share/$name/*
+        ln -fs /usr/share/$name/Waterwall /usr/bin/$name
+        chmod +x /usr/bin/$name
+        printf "$GREEN"  "[*] Success installing $name"
+    fi
 
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
@@ -274,29 +274,28 @@ EOF
 main ()
 {
     # install hermavpn
-	if [ ! -d "/usr/share/hermavpn" ]; then
-		local name="hermavpn"
-		mkdir -p /usr/share/$name
-		curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
-		chmod 755 /usr/share/$name/*
-		cat > /usr/bin/$name << EOF
+    if [ ! -d "/usr/share/hermavpn" ]; then
+        local name="hermavpn"
+        mkdir -p /usr/share/$name
+        curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
+        chmod 755 /usr/share/$name/*
+        cat > /usr/bin/$name << EOF
 #!/bin/bash
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
-		chmod +x /usr/bin/$name
+        chmod +x /usr/bin/$name
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != $ver ]; then
         local name="hermavpn"
-		mkdir -p /usr/share/$name
-		curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
-		chmod 755 /usr/share/$name/*
-		cat > /usr/bin/$name << EOF
+        mkdir -p /usr/share/$name
+        curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
+        chmod 755 /usr/share/$name/*
+        cat > /usr/bin/$name << EOF
 #!/bin/bash
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
-		chmod +x /usr/bin/$name
-    	bash /usr/share/$name/$name.sh
+        chmod +x /usr/bin/$name
+        bash /usr/share/$name/$name.sh
     fi
-
 }
 
 
@@ -307,16 +306,16 @@ logo
 
 select opt in "Endpoint" "Entrypoint" Exit
 do
-	case $opt in
-		"Endpoint")
-			printf "$GREEN"  "[*] Running Endpoint Tunnel..."
-			endpoint;;
-		"Entrypoint")
-			printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
-			entrypoint;;
-		"Exit")
-			echo "Exiting..."
-			break;;
-		*) echo "invalid option...";;
-	esac
+    case $opt in
+        "Endpoint")
+            printf "$GREEN"  "[*] Running Endpoint Tunnel..."
+            endpoint;;
+        "Entrypoint")
+            printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
+            entrypoint;;
+        "Exit")
+            echo "Exiting..."
+            break;;
+        *) echo "invalid option...";;
+    esac
 done

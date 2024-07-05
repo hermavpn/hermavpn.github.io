@@ -212,6 +212,7 @@ EOF
 }
 EOF
     fi
+    exit 0
 }
 
 
@@ -340,6 +341,7 @@ EOF
 }
 EOF
     fi
+    exit 0
 }
 
 

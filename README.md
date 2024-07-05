@@ -3,7 +3,7 @@
 - Easy installation of all tunneling tools online.
 - Automatic script updates and new changes.
 
-### Install Linux Ubuntu +20
+### Install Ubuntu +20
 ```
 curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh | sudo bash
 ```

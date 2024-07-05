@@ -26,7 +26,7 @@ else
     apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh ufw nano dnsutils openssl haproxy sniproxy socat 
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
@@ -83,20 +83,6 @@ entrypoint ()
         echo "entrypoint" > /etc/hostname
     fi
 
-    # add ufw rules
-    UFW_CHECK=$(ufw status | grep -m 1 '80' | awk '{print $1}')
-    if [ ! "$UFW_CHECK" == "53,80,443,8080/udp" ] ; then
-        ufw enable
-        ufw allow 53,80,443,8080/udp
-        ufw allow 22,80,443,8080/tcp
-        ufw deny out from any to 10.0.0.0/8
-        ufw deny out from any to 172.16.0.0/12
-        ufw deny out from any to 192.168.0.0/16
-        ufw deny out from any to 100.64.0.0/10
-        curl -sSL https://www.arvancloud.ir/en/ips.txt | awk '{print "ufw deny out from any to " $1}' | bash > /dev/null &
-        curl -sSL https://www.ipdeny.com/ipblocks/data/countries/ir.zone | awk '{print "ufw deny out from any to " $1}' | bash > /dev/null &
-    fi
-
     # install waterwall
     if [ ! -d "/usr/share/waterwall" ]; then
         local name="waterwall"
@@ -107,7 +93,7 @@ entrypoint ()
         chmod +x /usr/bin/$name
         cat > /etc/$name.local << EOF
 #!/bin/bash
-nohup ./$name &
+cd /usr/share/$name;nohup ./Waterwall &
 exit 0
 EOF
         chmod +x /etc/$name.local
@@ -233,7 +219,7 @@ endpoint ()
         chmod +x /usr/bin/$name
         cat > /etc/$name.local << EOF
 #!/bin/bash
-nohup ./$name &
+cd /usr/share/$name;nohup ./Waterwall &
 exit 0
 EOF
         chmod +x /etc/$name.local

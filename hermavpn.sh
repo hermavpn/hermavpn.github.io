@@ -94,6 +94,33 @@ entrypoint ()
         chmod 755 /usr/share/$name/*
         ln -fs /usr/share/$name/Waterwall /usr/bin/$name
         chmod +x /usr/bin/$name
+        cat > /etc/$name.local << EOF
+#!/bin/bash
+nohup ./$name &
+exit 0
+EOF
+        chmod +x /etc/$name.local
+        cat > /usr/lib/systemd/system/$name.service << EOF
+[Unit]
+Description=WaterWall Tunneling
+After=network.target
+After=syslog.target
+After=nss-lookup.target
+
+[Install]
+WantedBy=multi-user.target
+Alias=$name.target
+
+[Service]
+Type=forking
+ExecStart=/etc/$name.local
+ExecStop=pkill $name
+Restart=on-failure
+RestartSec=10
+RemainAfterExit=yes
+EOF
+        systemctl daemon-reload
+        systemctl enable $name;systemctl start $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 
@@ -186,6 +213,33 @@ endpoint ()
         chmod 755 /usr/share/$name/*
         ln -fs /usr/share/$name/Waterwall /usr/bin/$name
         chmod +x /usr/bin/$name
+        cat > /etc/$name.local << EOF
+#!/bin/bash
+nohup ./$name &
+exit 0
+EOF
+        chmod +x /etc/$name.local
+        cat > /usr/lib/systemd/system/$name.service << EOF
+[Unit]
+Description=WaterWall Tunneling
+After=network.target
+After=syslog.target
+After=nss-lookup.target
+
+[Install]
+WantedBy=multi-user.target
+Alias=$name.target
+
+[Service]
+Type=forking
+ExecStart=/etc/$name.local
+ExecStop=pkill $name
+Restart=on-failure
+RestartSec=10
+RemainAfterExit=yes
+EOF
+        systemctl daemon-reload
+        systemctl enable $name;systemctl start $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 

@@ -392,10 +392,7 @@ if [ ! -d "/usr/share/waterwall" ]; then
 
     # Check if the download speed is less than the minimum bandwidth
     if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        echo "Download speed is too low: \$DOWNLOAD_SPEED Mbps. Rebooting..."
         sudo reboot
-    else
-        echo "Download speed is sufficient: \$DOWNLOAD_SPEED Mbps."
     fi
 fi
 EOF
@@ -422,10 +419,7 @@ if [ ! -d "/usr/share/waterwall" ]; then
 
     # Check if the download speed is less than the minimum bandwidth
     if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        echo "Download speed is too low: \$DOWNLOAD_SPEED Mbps. Rebooting..."
         sudo reboot
-    else
-        echo "Download speed is sufficient: \$DOWNLOAD_SPEED Mbps."
     fi
 fi
 EOF

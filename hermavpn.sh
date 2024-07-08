@@ -26,7 +26,7 @@ else
     apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils crontab 
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils 
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
@@ -430,7 +430,7 @@ if [ ! -d "/usr/share/waterwall" ]; then
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh
-        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
+        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | tab -
         bash /usr/share/$name/$name.sh
     fi
 }

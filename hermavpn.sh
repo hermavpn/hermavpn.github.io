@@ -382,6 +382,8 @@ cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << EOF
+#!/bin/bash
+
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
 
@@ -406,6 +408,8 @@ cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << EOF
+#!/bin/bash
+
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-ver='1.0'
+ver='1.1'
 
 
 
@@ -26,7 +26,7 @@ else
     apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils crontab 
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
@@ -370,6 +370,23 @@ EOF
         systemctl enable fail2ban;systemctl start fail2ban
     fi
 
+    # install bandwith checker
+    if [ ! -d "/usr/share/waterwall" ]; then
+        # Define the minimum acceptable bandwidth in Mbps
+        MIN_BANDWIDTH=10
+
+        # Run the speed test and parse the download speed
+        DOWNLOAD_SPEED=$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
+
+        # Check if the download speed is less than the minimum bandwidth
+        if (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l) )); then
+            echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
+            sudo reboot
+        else
+            echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
+        fi
+    fi
+
     # install hermavpn
     if [ ! -d "/usr/share/hermavpn" ]; then
         local name="hermavpn"
@@ -381,6 +398,26 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
+        cat > /usr/share/hermavpn/bandwith.sh << EOF
+# install bandwith checker
+if [ ! -d "/usr/share/waterwall" ]; then
+    # Define the minimum acceptable bandwidth in Mbps
+    MIN_BANDWIDTH=10
+
+    # Run the speed test and parse the download speed
+    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
+
+    # Check if the download speed is less than the minimum bandwidth
+    if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
+        echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
+        sudo reboot
+    else
+        echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
+    fi
+fi
+EOF
+        chmod +x /usr/share/hermavpn/bandwith.sh
+        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != $ver ]; then
         local name="hermavpn"
         mkdir -p /usr/share/$name
@@ -391,6 +428,26 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
+        cat > /usr/share/hermavpn/bandwith.sh << EOF
+# install bandwith checker
+if [ ! -d "/usr/share/waterwall" ]; then
+    # Define the minimum acceptable bandwidth in Mbps
+    MIN_BANDWIDTH=10
+
+    # Run the speed test and parse the download speed
+    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
+
+    # Check if the download speed is less than the minimum bandwidth
+    if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
+        echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
+        sudo reboot
+    else
+        echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
+    fi
+fi
+EOF
+        chmod +x /usr/share/hermavpn/bandwith.sh
+        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
         bash /usr/share/$name/$name.sh
     fi
 }

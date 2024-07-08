@@ -370,23 +370,6 @@ EOF
         systemctl enable fail2ban;systemctl start fail2ban
     fi
 
-    # install bandwith checker
-    if [ ! -d "/usr/share/waterwall" ]; then
-        # Define the minimum acceptable bandwidth in Mbps
-        MIN_BANDWIDTH=10
-
-        # Run the speed test and parse the download speed
-        DOWNLOAD_SPEED=$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
-
-        # Check if the download speed is less than the minimum bandwidth
-        if (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l) )); then
-            echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
-            sudo reboot
-        else
-            echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
-        fi
-    fi
-
     # install hermavpn
     if [ ! -d "/usr/share/hermavpn" ]; then
         local name="hermavpn"
@@ -405,14 +388,14 @@ if [ ! -d "/usr/share/waterwall" ]; then
     MIN_BANDWIDTH=10
 
     # Run the speed test and parse the download speed
-    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
+    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
 
     # Check if the download speed is less than the minimum bandwidth
     if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
+        echo "Download speed is too low: \$DOWNLOAD_SPEED Mbps. Rebooting..."
         sudo reboot
     else
-        echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
+        echo "Download speed is sufficient: \$DOWNLOAD_SPEED Mbps."
     fi
 fi
 EOF
@@ -435,14 +418,14 @@ if [ ! -d "/usr/share/waterwall" ]; then
     MIN_BANDWIDTH=10
 
     # Run the speed test and parse the download speed
-    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print $2}')
+    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
 
     # Check if the download speed is less than the minimum bandwidth
     if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        echo "Download speed is too low: $DOWNLOAD_SPEED Mbps. Rebooting..."
+        echo "Download speed is too low: \$DOWNLOAD_SPEED Mbps. Rebooting..."
         sudo reboot
     else
-        echo "Download speed is sufficient: $DOWNLOAD_SPEED Mbps."
+        echo "Download speed is sufficient: \$DOWNLOAD_SPEED Mbps."
     fi
 fi
 EOF

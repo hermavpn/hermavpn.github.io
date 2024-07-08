@@ -382,18 +382,15 @@ cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << EOF
-# install bandwith checker
-if [ ! -d "/usr/share/waterwall" ]; then
-    # Define the minimum acceptable bandwidth in Mbps
-    MIN_BANDWIDTH=10
+# Define the minimum acceptable bandwidth in Mbps
+MIN_BANDWIDTH=10
 
-    # Run the speed test and parse the download speed
-    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
+# Run the speed test and parse the download speed
+DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
 
-    # Check if the download speed is less than the minimum bandwidth
-    if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        sudo reboot
-    fi
+# Check if the download speed is less than the minimum bandwidth
+if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
+    sudo reboot
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh
@@ -409,18 +406,15 @@ cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << EOF
-# install bandwith checker
-if [ ! -d "/usr/share/waterwall" ]; then
-    # Define the minimum acceptable bandwidth in Mbps
-    MIN_BANDWIDTH=10
+# Define the minimum acceptable bandwidth in Mbps
+MIN_BANDWIDTH=10
 
-    # Run the speed test and parse the download speed
-    DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
+# Run the speed test and parse the download speed
+DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
 
-    # Check if the download speed is less than the minimum bandwidth
-    if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-        sudo reboot
-    fi
+# Check if the download speed is less than the minimum bandwidth
+if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
+    sudo reboot
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh

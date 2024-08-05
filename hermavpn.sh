@@ -279,29 +279,15 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-  "name": "simple_multiport_hd_server",
+  "name": "simple_multiport",
   "nodes": [
     {
       "name": "input",
       "type": "TcpListener",
       "settings": {
         "address": "0.0.0.0",
-        "port": 8080,
+        "port": [23, 65535],
         "nodelay": true
-      },
-      "next": "halfs"
-    },
-    {
-      "name": "halfs",
-      "type": "HalfDuplexServer",
-      "settings": {},
-      "next": "port_header"
-    },
-    {
-      "name": "port_header",
-      "type": "HeaderServer",
-      "settings": {
-        "override": "dest_context->port"
       },
       "next": "output"
     },
@@ -310,8 +296,8 @@ EOF
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "127.0.0.1",
-        "port": "dest_context->port"
+        "address": "1.1.1.1",
+        "port": "src_context->port"
       }
     }
   ]

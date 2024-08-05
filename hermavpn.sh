@@ -158,38 +158,85 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-  "name": "simple_multiport_hd_client",
+  "name": "reverse_reality_grpc_server_multiport",
   "nodes": [
     {
-      "name": "input",
+      "name": "users_inbound",
       "type": "TcpListener",
       "settings": {
         "address": "0.0.0.0",
-        "port": [23, 65535],
+        "port": [443, 65535],
         "nodelay": true
       },
-      "next": "port_header"
+      "next": "header"
     },
     {
-      "name": "port_header",
+      "name": "header",
       "type": "HeaderClient",
       "settings": {
         "data": "src_context->port"
       },
-      "next": "halfc"
+      "next": "bridge2"
     },
     {
-      "name": "halfc",
-      "type": "HalfDuplexClient",
-      "next": "output"
+      "name": "bridge2",
+      "type": "Bridge",
+      "settings": {
+        "pair": "bridge1"
+      }
     },
     {
-      "name": "output",
+      "name": "bridge1",
+      "type": "Bridge",
+      "settings": {
+        "pair": "bridge2"
+      }
+    },
+    {
+      "name": "reverse_server",
+      "type": "ReverseServer",
+      "settings": {},
+      "next": "bridge1"
+    },
+    {
+      "name": "pbserver",
+      "type": "ProtoBufServer",
+      "settings": {},
+      "next": "reverse_server"
+    },
+    {
+      "name": "h2server",
+      "type": "Http2Server",
+      "settings": {},
+      "next": "pbserver"
+    },
+    {
+      "name": "reality_server",
+      "type": "RealityServer",
+      "settings": {
+        "destination": "reality_dest",
+        "password": "passwd"
+      },
+      "next": "h2server"
+    },
+    {
+      "name": "kharej_inbound",
+      "type": "TcpListener",
+      "settings": {
+        "address": "0.0.0.0",
+        "port": 443,
+        "nodelay": true,
+        "whitelist": ["$IP_SUBDOMAIN_ENDPOINT/32"]
+      },
+      "next": "reality_server"
+    },
+    {
+      "name": "reality_dest",
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "$IP_SUBDOMAIN_ENDPOINT",
-        "port": 8080
+        "address": "matrix.snapp.ir",
+        "port": 443
       }
     }
   ]
@@ -279,25 +326,82 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-  "name": "simple_multiport",
+  "name": "reverse_reality_grpc_client_multiport",
   "nodes": [
     {
-      "name": "input",
-      "type": "TcpListener",
-      "settings": {
-        "address": "0.0.0.0",
-        "port": [23, 65535],
-        "nodelay": true
-      },
-      "next": "output"
-    },
-    {
-      "name": "output",
+      "name": "outbound_to_core",
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "$IP_SUBDOMAIN_ENDPOINT",
-        "port": "src_context->port"
+        "address": "127.0.0.1",
+        "port": "dest_context->port"
+      }
+    },
+    {
+      "name": "header",
+      "type": "HeaderServer",
+      "settings": {
+        "override": "dest_context->port"
+      },
+      "next": "outbound_to_core"
+    },
+    {
+      "name": "bridge1",
+      "type": "Bridge",
+      "settings": {
+        "pair": "bridge2"
+      },
+      "next": "header"
+    },
+    {
+      "name": "bridge2",
+      "type": "Bridge",
+      "settings": {
+        "pair": "bridge1"
+      },
+      "next": "reverse_client"
+    },
+    {
+      "name": "reverse_client",
+      "type": "ReverseClient",
+      "settings": {
+        "minimum-unused": 8
+      },
+      "next": "pbclient"
+    },
+    {
+      "name": "pbclient",
+      "type": "ProtoBufClient",
+      "settings": {},
+      "next": "h2client"
+    },
+    {
+      "name": "h2client",
+      "type": "Http2Client",
+      "settings": {
+        "host": "matrix.snapp.ir",
+        "port": 443,
+        "path": "/",
+        "content-type": "application/grpc"
+      },
+      "next": "reality_client"
+    },
+    {
+      "name": "reality_client",
+      "type": "RealityClient",
+      "settings": {
+        "sni": "matrix.snapp.ir",
+        "password": "passwd"
+      },
+      "next": "outbound_to_iran"
+    },
+    {
+      "name": "outbound_to_iran",
+      "type": "TcpConnector",
+      "settings": {
+        "nodelay": true,
+        "address": "$IP_SUBDOMAIN_ENTRYPOINT",
+        "port": 443
       }
     }
   ]

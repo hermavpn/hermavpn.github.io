@@ -296,7 +296,7 @@ EOF
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "1.1.1.1",
+        "address": "$IP_SUBDOMAIN_ENDPOINT",
         "port": "src_context->port"
       }
     }

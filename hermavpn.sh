@@ -1,5 +1,5 @@
 #!/bin/bash
-ver='1.1'
+ver='1.5'
 
 
 
@@ -26,7 +26,7 @@ else
     apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack certbot ssh nano dnsutils 
+    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack nano dnsutils  
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
@@ -119,8 +119,7 @@ Restart=on-failure
 RestartSec=10
 RemainAfterExit=yes
 EOF
-        systemctl daemon-reload
-        systemctl enable $name;systemctl start $name
+        systemctl daemon-reload;systemctl enable $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 
@@ -204,8 +203,8 @@ EOF
 endpoint ()
 {
     # Initialize hostname
-    if ! grep -q "entrypoint" /etc/hostname; then
-        echo "entrypoint" > /etc/hostname
+    if ! grep -q "endpoint" /etc/hostname; then
+        echo "endpoint" > /etc/hostname
     fi
 
     # install waterwall
@@ -241,8 +240,7 @@ Restart=on-failure
 RestartSec=10
 RemainAfterExit=yes
 EOF
-        systemctl daemon-reload
-        systemctl enable $name;systemctl start $name
+        systemctl daemon-reload;systemctl enable $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 
@@ -326,9 +324,6 @@ EOF
 
 main ()
 {
-    # Set Time Zone
-    timedatectl set-timezone Asia/Tehran
-
     # resolv fixed
     if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
         echo "nameserver 1.1.1.1" > /etc/resolv.conf
@@ -338,12 +333,6 @@ main ()
     # apt fixed
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
-    fi
-
-    # Initialize SSH root Login
-    if ! grep -q "prohibit-password" /etc/ssh/sshd_config; then
-        sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config
-        service ssh restart;service sshd restart
     fi
 
     # Initialize fail2ban
@@ -359,8 +348,7 @@ findtime = 60m
 bantime = 60m
 ignoreip = 127.0.0.1/8 ::1
 EOF
-        systemctl daemon-reload
-        systemctl enable fail2ban;systemctl start fail2ban
+        systemctl daemon-reload;systemctl enable fail2ban
     fi
 
     # install hermavpn
@@ -385,7 +373,7 @@ DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
 
 # Check if the download speed is less than the minimum bandwidth
 if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-    sudo reboot
+    reboot
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh

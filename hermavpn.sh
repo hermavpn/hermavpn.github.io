@@ -158,7 +158,7 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-  "name": "reverse_reality_grpc_server_multiport",
+  "name": "reverse_reality_server_multiport",
   "nodes": [
     {
       "name": "users_inbound",
@@ -199,25 +199,13 @@ EOF
       "next": "bridge1"
     },
     {
-      "name": "pbserver",
-      "type": "ProtoBufServer",
-      "settings": {},
-      "next": "reverse_server"
-    },
-    {
-      "name": "h2server",
-      "type": "Http2Server",
-      "settings": {},
-      "next": "pbserver"
-    },
-    {
       "name": "reality_server",
       "type": "RealityServer",
       "settings": {
         "destination": "reality_dest",
         "password": "passwd"
       },
-      "next": "h2server"
+      "next": "reverse_server"
     },
     {
       "name": "kharej_inbound",

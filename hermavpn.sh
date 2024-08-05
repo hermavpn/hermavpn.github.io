@@ -23,10 +23,10 @@ if [ "$(id -u)" != "0" ];then
     exit 0
 else
     # update & upgrade & dist-upgrade
-    apt update;apt upgrade -qqy;apt dist-upgrade -qqy;apt autoremove -qqy;apt autoclean
+    apt update;apt upgrade -y;apt dist-upgrade -y;apt autoremove -y;apt autoclean
 
     # init requirements
-    apt install -qqy wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack nano dnsutils  
+    apt install -y wget curl git net-tools gnupg apt-transport-https mlocate nload htop speedtest-cli fail2ban cron iftop zip tcptrack nano dnsutils  
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')

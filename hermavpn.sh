@@ -127,35 +127,31 @@ EOF
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
 {
-    "log": {
-        "path": "log/",
-        "core": {
-            "loglevel": "DEBUG",
-            "file": "core.log",
-            "console": true
-        },
-        "network": {
-            "loglevel": "DEBUG",
-            "file": "network.log",
-            "console": true
-
-        },
-        "dns": {
-            "loglevel": "SILENT",
-            "file": "dns.log",
-            "console": false
-
-        }
+  "log": {
+    "path": "log/",
+    "core": {
+      "loglevel": "DEBUG",
+      "file": "core.log",
+      "console": true
     },
-    "dns": {},
-    "misc": {
-        "workers": 0,
-        "ram-profile": "server",
-        "libs-path": "libs/"
+    "network": {
+      "loglevel": "DEBUG",
+      "file": "network.log",
+      "console": true
     },
-    "configs": [
-        "config.json"
-    ]
+    "dns": {
+      "loglevel": "SILENT",
+      "file": "dns.log",
+      "console": false
+    }
+  },
+  "dns": {},
+  "misc": {
+    "workers": 0,
+    "ram-profile": "server",
+    "libs-path": "libs/"
+  },
+  "configs": ["config.json"]
 }
 EOF
     fi
@@ -163,119 +159,41 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-    "name": "config_reverse_tls_grpc_multiport_hd_iran",
-    "nodes": [
-        {
-            "name": "inbound_users",
-            "type": "TcpListener",
-            "settings": {
-                "address": "0.0.0.0",
-                "port": [23,65535],
-                "nodelay": true
-            },
-            "next": "port_header"
-        },
-        {
-            "name": "port_header",
-            "type": "HeaderClient",
-            "settings": {
-                "data": "src_context->port"
-            },
-            "next": "bridge2"
-        },
-        {
-            "name": "bridge2",
-            "type": "Bridge",
-            "settings": {
-                "pair": "bridge1"
-            }
-        },
-        {
-            "name": "bridge1",
-            "type": "Bridge",
-            "settings": {
-                "pair": "bridge2"
-            }
-        },
-        {
-            "name": "reverse_server",
-            "type": "ReverseServer",
-            "settings": {},
-            "next": "bridge1"
-        },
-        {
-            "name": "halfs",
-            "type": "HalfDuplexServer",
-            "settings": {},
-            "next": "reverse_server"
-        },
-        {
-            "name": "grpc_server",
-            "type": "ProtoBufServer",
-            "settings": {},
-            "next": "halfs"
-        },
-        {
-            "name": "h2server",
-            "type": "Http2Server",
-            "settings": {},
-            "next": "grpc_server"
-        },
-        {
-            "name": "sslserver",
-            "type": "OpenSSLServer",
-            "settings": {
-                "cert-file": "/usr/share/hermavpn/fullchain.pem",
-                "key-file": "/usr/share/hermavpn/privkey.pem",
-                "alpns": [
-                    {
-                        "value": "h2",
-                        "next": "node->next"
-                    },
-                    {
-                        "value": "http/1.1",
-                        "next": "node->next"
-                    }
-                ],
-                "fallbackintencedelay": 0
-            },
-            "next": "h2server"
-        },
-        {
-            "name": "inbound_cloudflare",
-            "type": "TcpListener",
-            "settings": {
-                "address": "0.0.0.0",
-                "port": 443,
-                "nodelay": true,
-                "whitelist": [
-                    "173.245.48.0/20",
-                    "103.21.244.0/22",
-                    "103.22.200.0/22",
-                    "103.31.4.0/22",
-                    "141.101.64.0/18",
-                    "108.162.192.0/18",
-                    "190.93.240.0/20",
-                    "188.114.96.0/20",
-                    "197.234.240.0/22",
-                    "198.41.128.0/17",
-                    "162.158.0.0/15",
-                    "104.16.0.0/13",
-                    "104.24.0.0/14",
-                    "172.64.0.0/13",
-                    "131.0.72.0/22",
-                    "2400:cb00::/32",
-                    "2606:4700::/32",
-                    "2803:f800::/32",
-                    "2405:b500::/32",
-                    "2405:8100::/32",
-                    "2a06:98c0::/29",
-                    "2c0f:f248::/32"
-                ]
-            },
-            "next": "sslserver"
-        }
-    ]
+  "name": "simple_multiport_hd_client",
+  "nodes": [
+    {
+      "name": "input",
+      "type": "TcpListener",
+      "settings": {
+        "address": "0.0.0.0",
+        "port": [23, 65535],
+        "nodelay": true
+      },
+      "next": "port_header"
+    },
+    {
+      "name": "port_header",
+      "type": "HeaderClient",
+      "settings": {
+        "data": "src_context->port"
+      },
+      "next": "halfc"
+    },
+    {
+      "name": "halfc",
+      "type": "HalfDuplexClient",
+      "next": "output"
+    },
+    {
+      "name": "output",
+      "type": "TcpConnector",
+      "settings": {
+        "nodelay": true,
+        "address": "$IP_SUBDOMAIN_ENDPOINT",
+        "port": 8080
+      }
+    }
+  ]
 }
 EOF
     fi
@@ -331,35 +249,31 @@ EOF
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
 {
-    "log": {
-        "path": "log/",
-        "core": {
-            "loglevel": "DEBUG",
-            "file": "core.log",
-            "console": true
-        },
-        "network": {
-            "loglevel": "DEBUG",
-            "file": "network.log",
-            "console": true
-
-        },
-        "dns": {
-            "loglevel": "SILENT",
-            "file": "dns.log",
-            "console": false
-
-        }
+  "log": {
+    "path": "log/",
+    "core": {
+      "loglevel": "DEBUG",
+      "file": "core.log",
+      "console": true
     },
-    "dns": {},
-    "misc": {
-        "workers": 0,
-        "ram-profile": "server",
-        "libs-path": "libs/"
+    "network": {
+      "loglevel": "DEBUG",
+      "file": "network.log",
+      "console": true
     },
-    "configs": [
-        "config.json"
-    ]
+    "dns": {
+      "loglevel": "SILENT",
+      "file": "dns.log",
+      "console": false
+    }
+  },
+  "dns": {},
+  "misc": {
+    "workers": 0,
+    "ram-profile": "server",
+    "libs-path": "libs/"
+  },
+  "configs": ["config.json"]
 }
 EOF
     fi
@@ -367,91 +281,42 @@ EOF
     if [ ! -f "/usr/share/waterwall/config.json" ]; then
         cat > /usr/share/waterwall/config.json << EOF
 {
-    "name": "config_reverse_tls_grpc_multiport_hd_kharej",
-    "nodes": [
-        {
-            "name": "core_outbound",
-            "type": "TcpConnector",
-            "settings": {
-                "nodelay": true,
-                "address": "127.0.0.1",
-                "port": 443
-            }
-        },
-        {
-            "name": "port_header",
-            "type": "HeaderServer",
-            "settings": {
-                "override": "dest_context->port"
-            },
-            "next": "core_outbound"
-        },
-        {
-            "name": "bridge1",
-            "type": "Bridge",
-            "settings": {
-                "pair": "bridge2"
-            },
-            "next": "port_header"
-        },
-        {
-            "name": "bridge2",
-            "type": "Bridge",
-            "settings": {
-                "pair": "bridge1"
-            },
-            "next": "reverse_client"
-        },
-        {
-            "name": "reverse_client",
-            "type": "ReverseClient",
-            "settings": {
-            },
-            "next": "halfc"
-        },
-        {
-            "name": "halfc",
-            "type": "HalfDuplexClient",
-            "settings": {},
-            "next": "grpc_client"
-        },
-        {
-            "name": "grpc_client",
-            "type": "ProtoBufClient",
-            "settings": {},
-            "next": "h2client"
-        },
-        {
-            "name": "h2client",
-            "type": "Http2Client",
-            "settings": {
-                "host": "cdn.$DOMAIN",
-                "port": 443,
-                "path": "/service",
-                "content-type": "application/grpc"
-            },
-            "next": "sslclient"
-        },
-        {
-            "name": "sslclient",
-            "type": "OpenSSLClient",
-            "settings": {
-                "sni": "cdn.$DOMAIN",
-                "verify": true,
-                "alpn": "h2"
-            },
-            "next": "iran_outbound"
-        },
-        {
-            "name": "iran_outbound",
-            "type": "TcpConnector",
-            "settings": {
-                "nodelay": true,
-                "address": "cdn.$DOMAIN",
-                "port": 443
-            }
-        }
-    ]
+  "name": "simple_multiport_hd_server",
+  "nodes": [
+    {
+      "name": "input",
+      "type": "TcpListener",
+      "settings": {
+        "address": "0.0.0.0",
+        "port": 8080,
+        "nodelay": true
+      },
+      "next": "halfs"
+    },
+    {
+      "name": "halfs",
+      "type": "HalfDuplexServer",
+      "settings": {},
+      "next": "port_header"
+    },
+    {
+      "name": "port_header",
+      "type": "HeaderServer",
+      "settings": {
+        "override": "dest_context->port"
+      },
+      "next": "output"
+    },
+    {
+      "name": "output",
+      "type": "TcpConnector",
+      "settings": {
+        "nodelay": true,
+        "address": "127.0.0.1",
+        "port": "dest_context->port"
+      }
+    }
+  ]
 }
 EOF
     fi

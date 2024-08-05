@@ -19,7 +19,7 @@ SUBDOMAIN_ENDPOINT=$2
 
 if [ "$(id -u)" != "0" ];then
     printf "$RED"		"[X] Please run as ROOT..."
-    printf "$GREEN"     "[*] sudo hermavpn \$Endpoint \$Entrypoint"
+    printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
     exit 0
 else
     # update & upgrade & dist-upgrade

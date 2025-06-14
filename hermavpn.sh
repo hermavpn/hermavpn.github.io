@@ -442,13 +442,12 @@ EOF
 
     # install hermavpn
     if [ ! -d "/usr/share/hermavpn" ]; then
-        local name="hermavpn"
         mkdir -p /usr/share/$name
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
         chmod 755 /usr/share/$name/*
         cat > /usr/bin/$name << 'EOF'
 #!/bin/bash
-cd /usr/share/$name;bash $name.sh "\$@"
+cd /usr/share/hermavpn;bash hermavpn.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
@@ -477,7 +476,7 @@ EOF
         chmod 755 /usr/share/$name/*
         cat > /usr/bin/$name << EOF
 #!/bin/bash
-cd /usr/share/$name;bash $name.sh "\$@"
+cd /usr/share/hermavpn;bash hermavpn.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << 'EOF'

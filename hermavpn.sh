@@ -478,11 +478,11 @@ EOF
 arguments()
 {
     if [ -z "$1" ]; then
-        printf "$RED"       "[X] The Subdomain Endpoint Server has not been entered."
+        printf "$RED"       "[X] The Entrypoint Server has not been entered."
         printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
         exit 1
     elif [ -z "$2" ]; then
-        printf "$RED"       "[X] The Subdomain Entrypoint Server has not been entered."
+        printf "$RED"       "[X] The Endpoint Server has not been entered."
         printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
         exit 1
     fi

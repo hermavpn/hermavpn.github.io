@@ -75,16 +75,10 @@ logo ()
 }
 
 
-entrypoint ()
+waterwall()
 {
-    # Initialize hostname
-    if ! grep -q "entrypoint" /etc/hostname; then
-        echo "entrypoint" > /etc/hostname
-    fi
-
-    # install waterwall
-    if [ ! -d "/usr/share/waterwall" ]; then
-        local name="waterwall"
+    local name="waterwall"
+    if [ ! -d "/usr/share/$name" ]; then
         wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
         unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
         chmod 755 /usr/share/$name/*
@@ -119,6 +113,18 @@ EOF
         systemctl enable $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
+}
+
+
+entrypoint()
+{
+    # Initialize hostname
+    if ! grep -q "entrypoint" /etc/hostname; then
+        echo "entrypoint" > /etc/hostname
+    fi
+
+    # install waterwall
+    waterwall
 
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
@@ -252,42 +258,7 @@ endpoint ()
     fi
 
     # install waterwall
-    if [ ! -d "/usr/share/waterwall" ]; then
-        local name="waterwall"
-        wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
-        unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
-        chmod 755 /usr/share/$name/*
-        ln -fs /usr/share/$name/Waterwall /usr/bin/$name
-        chmod +x /usr/bin/$name
-        cat > /etc/$name.local << EOF
-#!/bin/bash
-cd /usr/share/waterwall
-exec ./Waterwall
-EOF
-        chmod +x /etc/$name.local
-        cat > /usr/lib/systemd/system/$name.service << EOF
-[Unit]
-Description=WaterWall Tunneling
-After=network.target syslog.target nss-lookup.target
-Wants=network-online.target
-
-[Service]
-Type=exec
-ExecStart=/etc/$name.local
-ExecReload=/bin/kill -HUP \$MAINPID
-KillMode=mixed
-Restart=on-failure
-RestartSec=10
-User=root
-Group=root
-
-[Install]
-WantedBy=multi-user.target
-EOF
-        systemctl daemon-reload
-        systemctl enable $name
-        printf "$GREEN"  "[*] Success installing $name"
-    fi
+    waterwall
 
     if [ ! -f "/usr/share/waterwall/core.json" ]; then
         cat > /usr/share/waterwall/core.json << EOF
@@ -442,41 +413,13 @@ EOF
 
     # install hermavpn
     if [ ! -d "/usr/share/hermavpn" ]; then
-        mkdir -p /usr/share/$name
-        curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
-        chmod 755 /usr/share/$name/*
-        cat > /usr/bin/$name << 'EOF'
-#!/bin/bash
-cd /usr/share/hermavpn;bash hermavpn.sh "\$@"
-EOF
-        chmod +x /usr/bin/$name
-        cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
-#!/bin/bash
-
-# Define the minimum acceptable bandwidth in Mbps
-MIN_BANDWIDTH=10
-
-# Run the speed test and parse the download speed
-if command -v speedtest-cli >/dev/null 2>&1; then
-    DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
-    
-    # Check if we got a valid result and if speed is below threshold
-    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
-        logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
-        /sbin/reboot
-    fi
-fi
-EOF
-        chmod +x /usr/share/hermavpn/bandwith.sh
-        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
-    elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != $ver ]; then
         local name="hermavpn"
         mkdir -p /usr/share/$name
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
         chmod 755 /usr/share/$name/*
         cat > /usr/bin/$name << EOF
 #!/bin/bash
-cd /usr/share/hermavpn;bash hermavpn.sh "\$@"
+cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
@@ -497,41 +440,68 @@ if command -v speedtest-cli >/dev/null 2>&1; then
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh
-        echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | tab -
+    elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
+        local name="hermavpn"
+        mkdir -p /usr/share/$name
+        curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
+        chmod 755 /usr/share/$name/*
+        cat > /usr/bin/$name << EOF
+#!/bin/bash
+cd /usr/share/$name;bash $name.sh "\$@"
+EOF
+        chmod +x /usr/bin/$name
+        cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
+#!/bin/bash
+
+# Define the minimum acceptable bandwidth in Mbps
+MIN_BANDWIDTH=10
+
+# Run the speed test and parse the download speed
+if command -v speedtest-cli >/dev/null 2>&1; then
+    DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
+    
+    # Check if we got a valid result and if speed is below threshold
+    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
+        logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
+        /sbin/reboot
+    fi
+fi
+EOF
+        chmod +x /usr/share/hermavpn/bandwith.sh
         bash /usr/share/$name/$name.sh
+    fi
+
+    echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
+}
+
+
+arguments()
+{
+    if [ -z "$1" ]; then
+        printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
+        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        exit 0
+    elif [ -z "$2" ]; then
+        printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
+        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        exit 0
     fi
 }
 
 
-main
 logo
+main
 
 
 select opt in "Endpoint" "Entrypoint" Exit
 do
     case $opt in
         "Endpoint")
-            if [ -z "$1" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            elif [ -z "$2" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            fi
+            arguments "$1" "$2"
             printf "$GREEN"  "[*] Running Endpoint Tunnel..."
             endpoint;;
         "Entrypoint")
-            if [ -z "$1" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            elif [ -z "$2" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            fi
+            arguments "$1" "$2"
             printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
             entrypoint;;
         "Exit")

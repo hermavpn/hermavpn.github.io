@@ -499,7 +499,7 @@ do
         "Endpoint"|"Entrypoint")
             arguments "$1" "$2"
             printf "$GREEN"  "[*] Running $opt Tunnel..."
-            "$opt";;
+            "${opt,,}";;
         "Exit")
             echo "Exiting..."
             break;;

@@ -1,16 +1,16 @@
 #!/bin/bash
-ver='1.5'
+ver="2.0"
 
 
-RED='\e[1;31m%s\e[0m\n'
-GREEN='\e[1;32m%s\e[0m\n'
-YELLOW='\e[1;33m%s\e[0m\n'
-BLUE='\e[1;34m%s\e[0m\n'
-MAGENTO='\e[1;35m%s\e[0m\n'
-CYAN='\e[1;36m%s\e[0m\n'
-WHITE='\e[1;37m%s\e[0m\n'
-SUBDOMAIN_ENTRYPOINT=$1
-SUBDOMAIN_ENDPOINT=$2
+RED="\e[1;31m%s\e[0m\n"
+GREEN="\e[1;32m%s\e[0m\n"
+YELLOW="\e[1;33m%s\e[0m\n"
+BLUE="\e[1;34m%s\e[0m\n"
+MAGENTO="\e[1;35m%s\e[0m\n"
+CYAN="\e[1;36m%s\e[0m\n"
+WHITE="\e[1;37m%s\e[0m\n"
+ENTRYPOINT="$1"
+ENDPOINT="$2"
 
 
 if [ "$(id -u)" != "0" ];then
@@ -26,11 +26,11 @@ else
     OS=`uname -m`
     USERS=$(users | awk '{print $1}')
     LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-    DOM_ONE=$(echo $SUBDOMAIN_ENDPOINT | awk -F. '{print $2}')
-    DOM_TWO=$(echo $SUBDOMAIN_ENDPOINT | awk -F. '{print $3}')
+    DOM_ONE=$(echo $ENDPOINT | awk -F. '{print $2}')
+    DOM_TWO=$(echo $ENTRYPOINT | awk -F. '{print $3}')
     DOMAIN=$(echo "$DOM_ONE.$DOM_TWO")
-    IP_SUBDOMAIN_ENDPOINT=$(dig -4 +short $SUBDOMAIN_ENDPOINT)
-    IP_SUBDOMAIN_ENTRYPOINT=$(dig -4 +short $SUBDOMAIN_ENTRYPOINT)
+    IP_ENDPOINT=$(dig -4 +short $ENDPOINT)
+    IP_ENTRYPOINT=$(dig -4 +short $ENTRYPOINT)
     INTERFACE=$(ip r | head -1 | cut -d " " -f5)
 fi
 
@@ -92,30 +92,31 @@ entrypoint ()
         chmod +x /usr/bin/$name
         cat > /etc/$name.local << EOF
 #!/bin/bash
-cd /usr/share/$name;nohup ./Waterwall &
-exit 0
+cd /usr/share/waterwall
+exec ./Waterwall
 EOF
         chmod +x /etc/$name.local
         cat > /usr/lib/systemd/system/$name.service << EOF
 [Unit]
 Description=WaterWall Tunneling
-After=network.target
-After=syslog.target
-After=nss-lookup.target
+After=network.target syslog.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+ExecStart=/etc/$name.local
+ExecReload=/bin/kill -HUP \$MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=10
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target
-Alias=$name.target
-
-[Service]
-Type=forking
-ExecStart=/etc/$name.local
-ExecStop=pkill $name
-Restart=on-failure
-RestartSec=10
-RemainAfterExit=yes
 EOF
-        systemctl daemon-reload;systemctl enable $name
+        systemctl daemon-reload
+        systemctl enable $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 
@@ -222,7 +223,7 @@ EOF
         "address": "0.0.0.0",
         "port": 443,
         "nodelay": true,
-        "whitelist": ["$IP_SUBDOMAIN_ENDPOINT/32"]
+        "whitelist": ["$IP_ENDPOINT/32"]
       },
       "next": "reality_server"
     },
@@ -231,7 +232,7 @@ EOF
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "matrix.snapp.ir",
+        "address": "element.snapp.ir",
         "port": 443
       }
     }
@@ -260,30 +261,31 @@ endpoint ()
         chmod +x /usr/bin/$name
         cat > /etc/$name.local << EOF
 #!/bin/bash
-cd /usr/share/$name;nohup ./Waterwall &
-exit 0
+cd /usr/share/waterwall
+exec ./Waterwall
 EOF
         chmod +x /etc/$name.local
         cat > /usr/lib/systemd/system/$name.service << EOF
 [Unit]
 Description=WaterWall Tunneling
-After=network.target
-After=syslog.target
-After=nss-lookup.target
+After=network.target syslog.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+ExecStart=/etc/$name.local
+ExecReload=/bin/kill -HUP \$MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=10
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target
-Alias=$name.target
-
-[Service]
-Type=forking
-ExecStart=/etc/$name.local
-ExecStop=pkill $name
-Restart=on-failure
-RestartSec=10
-RemainAfterExit=yes
 EOF
-        systemctl daemon-reload;systemctl enable $name
+        systemctl daemon-reload
+        systemctl enable $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 
@@ -375,7 +377,7 @@ EOF
       "name": "h2client",
       "type": "Http2Client",
       "settings": {
-        "host": "matrix.snapp.ir",
+        "host": "element.snapp.ir",
         "port": 443,
         "path": "/",
         "content-type": "application/grpc"
@@ -386,7 +388,7 @@ EOF
       "name": "reality_client",
       "type": "RealityClient",
       "settings": {
-        "sni": "matrix.snapp.ir",
+        "sni": "element.snapp.ir",
         "password": "passwd"
       },
       "next": "outbound_to_iran"
@@ -396,7 +398,7 @@ EOF
       "type": "TcpConnector",
       "settings": {
         "nodelay": true,
-        "address": "$IP_SUBDOMAIN_ENTRYPOINT",
+        "address": "$IP_ENTRYPOINT",
         "port": 443
       }
     }
@@ -434,7 +436,8 @@ findtime = 60m
 bantime = 60m
 ignoreip = 127.0.0.1/8 ::1
 EOF
-        systemctl daemon-reload;systemctl enable fail2ban
+        systemctl daemon-reload
+        systemctl enable fail2ban
     fi
 
     # install hermavpn
@@ -443,23 +446,26 @@ EOF
         mkdir -p /usr/share/$name
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
         chmod 755 /usr/share/$name/*
-        cat > /usr/bin/$name << EOF
+        cat > /usr/bin/$name << 'EOF'
 #!/bin/bash
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/hermavpn/bandwith.sh << EOF
+        cat > "/usr/share/hermavpn/bandwith.sh" << EOF
 #!/bin/bash
 
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
 
 # Run the speed test and parse the download speed
-DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
-
-# Check if the download speed is less than the minimum bandwidth
-if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-    reboot
+if command -v speedtest-cli >/dev/null 2>&1; then
+    DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
+    
+    # Check if we got a valid result and if speed is below threshold
+    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
+        logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
+        /sbin/reboot
+    fi
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh
@@ -474,18 +480,21 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/hermavpn/bandwith.sh << EOF
+        cat > "/usr/share/hermavpn/bandwith.sh" << 'EOF'
 #!/bin/bash
 
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
 
 # Run the speed test and parse the download speed
-DOWNLOAD_SPEED=\$(speedtest-cli --simple | grep 'Download' | awk '{print \$2}')
-
-# Check if the download speed is less than the minimum bandwidth
-if (( \$(echo "\$DOWNLOAD_SPEED < \$MIN_BANDWIDTH" | bc -l) )); then
-    sudo reboot
+if command -v speedtest-cli >/dev/null 2>&1; then
+    DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
+    
+    # Check if we got a valid result and if speed is below threshold
+    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
+        logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
+        /sbin/reboot
+    fi
 fi
 EOF
         chmod +x /usr/share/hermavpn/bandwith.sh

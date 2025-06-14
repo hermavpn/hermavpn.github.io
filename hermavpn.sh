@@ -1,5 +1,5 @@
 #!/bin/bash
-ver="1.9"
+ver="2.0"
 
 
 RED="\e[1;31m%s\e[0m\n"
@@ -475,37 +475,31 @@ EOF
 }
 
 
-main
+arguments()
+{
+    if [ -z "$1" ]; then
+        printf "$RED"       "[X] The Subdomain Endpoint Server has not been entered."
+        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        exit 1
+    elif [ -z "$2" ]; then
+        printf "$RED"       "[X] The Subdomain Entrypoint Server has not been entered."
+        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        exit 1
+    fi
+}
+
+
 logo
+main
 
 
 select opt in "Endpoint" "Entrypoint" Exit
 do
     case $opt in
-        "Endpoint")
-            if [ -z "$1" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            elif [ -z "$2" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            fi
-            printf "$GREEN"  "[*] Running Endpoint Tunnel..."
-            endpoint;;
-        "Entrypoint")
-            if [ -z "$1" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            elif [ -z "$2" ]; then
-                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-                exit 0
-            fi
-            printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
-            entrypoint;;
+        "Endpoint"|"Entrypoint")
+            arguments "$1" "$2"
+            printf "$GREEN"  "[*] Running $opt Tunnel..."
+            "$opt";;
         "Exit")
             echo "Exiting..."
             break;;

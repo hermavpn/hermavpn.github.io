@@ -475,33 +475,35 @@ EOF
 }
 
 
-arguments()
-{
-    if [ -z "$1" ]; then
-        printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
-        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-        exit 0
-    elif [ -z "$2" ]; then
-        printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
-        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-        exit 0
-    fi
-}
-
-
-logo
 main
+logo
 
 
 select opt in "Endpoint" "Entrypoint" Exit
 do
     case $opt in
         "Endpoint")
-            arguments "$1" "$2"
+            if [ -z "$1" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+                exit 0
+            elif [ -z "$2" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+                exit 0
+            fi
             printf "$GREEN"  "[*] Running Endpoint Tunnel..."
             endpoint;;
         "Entrypoint")
-            arguments "$1" "$2"
+            if [ -z "$1" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Endpoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+                exit 0
+            elif [ -z "$2" ]; then
+                printf "$RED"       "[X] The second argument has not Subdomain Entrypoint Server entered."
+                printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+                exit 0
+            fi
             printf "$GREEN"  "[*] Running Entrypoint Tunnel..."
             entrypoint;;
         "Exit")

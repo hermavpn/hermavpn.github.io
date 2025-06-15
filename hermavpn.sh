@@ -187,15 +187,35 @@ EOF
 # execute main
 main()
 {
+
+    # bypass limited
+    ip link set dev eth0 mtu 1420
+
     # resolv fixed
     if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
         echo "nameserver 8.8.4.4" > /etc/resolv.conf
         echo "nameserver 8.8.8.8" >> /etc/resolv.conf
     fi
 
-    # apt fixed
+    # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
+    fi
+
+    # apt fixed germany
+    if grep -q "de.archive.ubuntu.com" /etc/apt/sources.list; then
+        sed -i "s|de.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
+    fi
+
+    # Configure DNS with error handling
+    if ! grep -q "nameserver 178.22.122.100" /etc/resolv.conf 2>/dev/null; then
+        echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" > /etc/resolv.conf
+        chattr +i /etc/resolv.conf 2>/dev/null
+        cat > /etc/hosts << EOF
+185.199.108.133 raw.githubusercontent.com
+185.125.190.36 archive.ubuntu.com
+185.125.190.39 security.ubuntu.com
+EOF     
     fi
 
     # Initialize fail2ban
@@ -246,7 +266,6 @@ EOF
         chmod +x /usr/share/$name/bandwith.sh
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
         local name="hermavpn"
-        mkdir -p /usr/share/$name
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
         chmod 755 /usr/share/$name/*
         cat > /usr/bin/$name << EOF

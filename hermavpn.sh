@@ -81,8 +81,9 @@ backhaul()
 {
     if [ ! -d "/usr/share/backhaul" ]; then
       local name="backhaul"
+      mkdir -p /usr/share/$name
       wget https://github.com/Musixal/Backhaul/releases/latest/download/backhaul_linux_amd64.tar.gz -O /tmp/$name.tar.gz
-      tar --strip-components=1 -xzf /tmp/$name.tar.gz -C /usr/share/$name;rm -f /tmp/$name.tar.gz
+      tar -xzf /tmp/$name.tar.gz -C /usr/share/$name
       chmod 755 /usr/share/$name/*
       ln -fs /usr/share/$name/backhaul /usr/bin/$name
       chmod +x /usr/bin/$name

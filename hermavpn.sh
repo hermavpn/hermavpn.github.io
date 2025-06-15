@@ -170,12 +170,12 @@ endpoint()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcp"
-token = "00980098" 
+token = "00980098"
 connection_pool = 8
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
-nodelay = true 
+nodelay = true
 retry_interval = 3
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"

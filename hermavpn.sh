@@ -144,7 +144,7 @@ channel_size = 2048
 sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
-ports = ["80"]
+ports = ["80", "443"]
 EOF
     fi
 

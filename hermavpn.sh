@@ -135,16 +135,19 @@ entrypoint()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "tcp"
-accept_udp = false
+accept_udp = false 
 token = "00980098"
-keepalive_period = 75
-nodelay = true
-heartbeat = 40
+keepalive_period = 75  
+nodelay = true 
+heartbeat = 40 
 channel_size = 2048
-sniffer = false
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
-ports = ["80", "443"]
+ports = [
+    "80=127.0.0.1:80",     # HTTP traffic
+    "443=127.0.0.1:443"    # HTTPS/VLESS traffic
+]
 EOF
     fi
 
@@ -165,19 +168,18 @@ endpoint()
     if [ ! -f "/usr/share/backhaul/config.toml" ]; then
         cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "IP_ENTRYPOINT:8080"
 transport = "tcp"
-token = "00980098"
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
-nodelay = true
+nodelay = true 
 retry_interval = 3
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
-ports = ["443:443"]
 EOF
     fi
 

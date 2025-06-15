@@ -189,7 +189,7 @@ main()
 {
 
     # bypass limited
-    ip link set dev eth0 mtu 1420
+    ip link set dev $INTERFACE mtu 1420
 
     # resolv fixed
     if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then

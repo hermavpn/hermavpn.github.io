@@ -102,7 +102,7 @@ Wants=network-online.target
 [Service]
 Type=exec
 ExecStart=/etc/$name.local
-ExecReload=/bin/kill -HUP \$MAINPID
+ExecReload=/bin/pkill $name
 KillMode=mixed
 Restart=on-failure
 RestartSec=10

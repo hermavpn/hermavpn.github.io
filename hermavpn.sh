@@ -168,7 +168,7 @@ endpoint()
     if [ ! -f "/usr/share/backhaul/config.toml" ]; then
         cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcp"
 token = "00980098" 
 connection_pool = 8

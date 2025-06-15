@@ -1,7 +1,7 @@
 #!/bin/bash
 ver="2.0"
 
-
+# color variables
 RED="\e[1;31m%s\e[0m\n"
 GREEN="\e[1;32m%s\e[0m\n"
 YELLOW="\e[1;33m%s\e[0m\n"
@@ -9,10 +9,12 @@ BLUE="\e[1;34m%s\e[0m\n"
 MAGENTO="\e[1;35m%s\e[0m\n"
 CYAN="\e[1;36m%s\e[0m\n"
 WHITE="\e[1;37m%s\e[0m\n"
+
+# endpoint variables
 ENTRYPOINT="$1"
 ENDPOINT="$2"
 
-
+# root checks 
 if [ "$(id -u)" != "0" ];then
     printf "$RED"		"[X] Please run as ROOT..."
     printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
@@ -34,7 +36,7 @@ else
     INTERFACE=$(ip r | head -1 | cut -d " " -f5)
 fi
 
-
+# unk9vvn logo
 logo ()
 {
     reset;clear
@@ -74,25 +76,25 @@ logo ()
     printf "\n\n"
 }
 
-
-waterwall()
+# install backhaul
+backhaul()
 {
-    local name="waterwall"
-    if [ ! -d "/usr/share/$name" ]; then
-        wget https://github.com/radkesvat/WaterWall/releases/latest/download/Waterwall-linux-64.zip -O /tmp/$name.zip
-        unzip /tmp/$name.zip -d /usr/share/$name;rm -f /tmp/$name.zip
-        chmod 755 /usr/share/$name/*
-        ln -fs /usr/share/$name/Waterwall /usr/bin/$name
-        chmod +x /usr/bin/$name
-        cat > /etc/$name.local << EOF
+    if [ ! -d "/usr/share/backhaul" ]; then
+      local name="backhaul"
+      wget https://github.com/Musixal/Backhaul/releases/latest/download/backhaul_linux_amd64.tar.gz -O /tmp/$name.tar.gz
+      tar --strip-components=1 -xzf /tmp/$name.tar.gz -C /usr/share/$name;rm -f /tmp/$name.tar.gz
+      chmod 755 /usr/share/$name/*
+      ln -fs /usr/share/$name/backhaul /usr/bin/$name
+      chmod +x /usr/bin/$name
+      cat > /etc/$name.local << EOF
 #!/bin/bash
-cd /usr/share/waterwall
-exec ./Waterwall
+cd /usr/share/$name
+exec ./$name
 EOF
-        chmod +x /etc/$name.local
-        cat > /usr/lib/systemd/system/$name.service << EOF
+      chmod +x /etc/$name.local
+      cat > /usr/lib/systemd/system/$name.service << EOF
 [Unit]
-Description=WaterWall Tunneling
+Description=$name Tunneling
 After=network.target syslog.target nss-lookup.target
 Wants=network-online.target
 
@@ -115,7 +117,7 @@ EOF
     fi
 }
 
-
+# entrypoint server
 entrypoint()
 {
     # Initialize hostname
@@ -123,269 +125,70 @@ entrypoint()
         echo "entrypoint" > /etc/hostname
     fi
 
-    # install waterwall
-    waterwall
+    # install backhaul
+    backhaul
 
-    if [ ! -f "/usr/share/waterwall/core.json" ]; then
-        cat > /usr/share/waterwall/core.json << EOF
-{
-  "log": {
-    "path": "log/",
-    "core": {
-      "loglevel": "DEBUG",
-      "file": "core.log",
-      "console": true
-    },
-    "network": {
-      "loglevel": "DEBUG",
-      "file": "network.log",
-      "console": true
-    },
-    "dns": {
-      "loglevel": "SILENT",
-      "file": "dns.log",
-      "console": false
-    }
-  },
-  "dns": {},
-  "misc": {
-    "workers": 0,
-    "ram-profile": "server",
-    "libs-path": "libs/"
-  },
-  "configs": ["config.json"]
-}
+    if [ ! -f "/usr/share/backhaul/config.toml" ]; then
+        cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:2525"
+transport = "tcp"
+accept_udp = false 
+token = "00980098"
+keepalive_period = 75  
+nodelay = true 
+heartbeat = 40 
+channel_size = 2048
+sniffer = false 
+web_port = 2060
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [80,443]
 EOF
     fi
 
-    if [ ! -f "/usr/share/waterwall/config.json" ]; then
-        cat > /usr/share/waterwall/config.json << EOF
-{
-  "name": "reverse_reality_grpc_server_multiport",
-  "nodes": [
-    {
-      "name": "users_inbound",
-      "type": "TcpListener",
-      "settings": {
-        "address": "0.0.0.0",
-        "port": [443, 65535],
-        "nodelay": true
-      },
-      "next": "header"
-    },
-    {
-      "name": "header",
-      "type": "HeaderClient",
-      "settings": {
-        "data": "src_context->port"
-      },
-      "next": "bridge2"
-    },
-    {
-      "name": "bridge2",
-      "type": "Bridge",
-      "settings": {
-        "pair": "bridge1"
-      }
-    },
-    {
-      "name": "bridge1",
-      "type": "Bridge",
-      "settings": {
-        "pair": "bridge2"
-      }
-    },
-    {
-      "name": "reverse_server",
-      "type": "ReverseServer",
-      "settings": {},
-      "next": "bridge1"
-    },
-    {
-      "name": "pbserver",
-      "type": "ProtoBufServer",
-      "settings": {},
-      "next": "reverse_server"
-    },
-    {
-      "name": "h2server",
-      "type": "Http2Server",
-      "settings": {},
-      "next": "pbserver"
-    },
-    {
-      "name": "reality_server",
-      "type": "RealityServer",
-      "settings": {
-        "destination": "reality_dest",
-        "password": "passwd"
-      },
-      "next": "h2server"
-    },
-    {
-      "name": "kharej_inbound",
-      "type": "TcpListener",
-      "settings": {
-        "address": "0.0.0.0",
-        "port": 443,
-        "nodelay": true,
-        "whitelist": ["$IP_ENDPOINT/32"]
-      },
-      "next": "reality_server"
-    },
-    {
-      "name": "reality_dest",
-      "type": "TcpConnector",
-      "settings": {
-        "nodelay": true,
-        "address": "element.snapp.ir",
-        "port": 443
-      }
-    }
-  ]
-}
-EOF
-    fi
     exit 0
 }
 
-
-endpoint ()
+# endpoint server
+endpoint()
 {
     # Initialize hostname
     if ! grep -q "endpoint" /etc/hostname; then
         echo "endpoint" > /etc/hostname
     fi
 
-    # install waterwall
-    waterwall
+    # install backhaul
+    backhaul
 
-    if [ ! -f "/usr/share/waterwall/core.json" ]; then
-        cat > /usr/share/waterwall/core.json << EOF
-{
-  "log": {
-    "path": "log/",
-    "core": {
-      "loglevel": "DEBUG",
-      "file": "core.log",
-      "console": true
-    },
-    "network": {
-      "loglevel": "DEBUG",
-      "file": "network.log",
-      "console": true
-    },
-    "dns": {
-      "loglevel": "SILENT",
-      "file": "dns.log",
-      "console": false
-    }
-  },
-  "dns": {},
-  "misc": {
-    "workers": 0,
-    "ram-profile": "server",
-    "libs-path": "libs/"
-  },
-  "configs": ["config.json"]
-}
+    if [ ! -f "/usr/share/backhaul/config.toml" ]; then
+        cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:2525"
+transport = "tcp"
+token = "00980098" 
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true 
+retry_interval = 3
+sniffer = false
+web_port = 2060 
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
 EOF
     fi
 
-    if [ ! -f "/usr/share/waterwall/config.json" ]; then
-        cat > /usr/share/waterwall/config.json << EOF
-{
-  "name": "reverse_reality_grpc_client_multiport",
-  "nodes": [
-    {
-      "name": "outbound_to_core",
-      "type": "TcpConnector",
-      "settings": {
-        "nodelay": true,
-        "address": "127.0.0.1",
-        "port": "dest_context->port"
-      }
-    },
-    {
-      "name": "header",
-      "type": "HeaderServer",
-      "settings": {
-        "override": "dest_context->port"
-      },
-      "next": "outbound_to_core"
-    },
-    {
-      "name": "bridge1",
-      "type": "Bridge",
-      "settings": {
-        "pair": "bridge2"
-      },
-      "next": "header"
-    },
-    {
-      "name": "bridge2",
-      "type": "Bridge",
-      "settings": {
-        "pair": "bridge1"
-      },
-      "next": "reverse_client"
-    },
-    {
-      "name": "reverse_client",
-      "type": "ReverseClient",
-      "settings": {
-        "minimum-unused": 8
-      },
-      "next": "pbclient"
-    },
-    {
-      "name": "pbclient",
-      "type": "ProtoBufClient",
-      "settings": {},
-      "next": "h2client"
-    },
-    {
-      "name": "h2client",
-      "type": "Http2Client",
-      "settings": {
-        "host": "element.snapp.ir",
-        "port": 443,
-        "path": "/",
-        "content-type": "application/grpc"
-      },
-      "next": "reality_client"
-    },
-    {
-      "name": "reality_client",
-      "type": "RealityClient",
-      "settings": {
-        "sni": "element.snapp.ir",
-        "password": "passwd"
-      },
-      "next": "outbound_to_iran"
-    },
-    {
-      "name": "outbound_to_iran",
-      "type": "TcpConnector",
-      "settings": {
-        "nodelay": true,
-        "address": "$IP_ENTRYPOINT",
-        "port": 443
-      }
-    }
-  ]
-}
-EOF
-    fi
     exit 0
 }
 
-
-main ()
+# execute main
+main()
 {
     # resolv fixed
     if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
-        echo "nameserver 1.1.1.1" > /etc/resolv.conf
+        echo "nameserver 8.8.4.4" > /etc/resolv.conf
         echo "nameserver 8.8.8.8" >> /etc/resolv.conf
     fi
 
@@ -422,7 +225,7 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
+        cat > /usr/share/$name/bandwith.sh << 'EOF'
 #!/bin/bash
 
 # Define the minimum acceptable bandwidth in Mbps
@@ -439,7 +242,7 @@ if command -v speedtest-cli >/dev/null 2>&1; then
     fi
 fi
 EOF
-        chmod +x /usr/share/hermavpn/bandwith.sh
+        chmod +x /usr/share/$name/bandwith.sh
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
         local name="hermavpn"
         mkdir -p /usr/share/$name
@@ -450,7 +253,7 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/hermavpn/bandwith.sh << 'EOF'
+        cat > /usr/share/$name/bandwith.sh << 'EOF'
 #!/bin/bash
 
 # Define the minimum acceptable bandwidth in Mbps
@@ -467,7 +270,7 @@ if command -v speedtest-cli >/dev/null 2>&1; then
     fi
 fi
 EOF
-        chmod +x /usr/share/hermavpn/bandwith.sh
+        chmod +x /usr/share/$name/bandwith.sh
         bash /usr/share/$name/$name.sh
     fi
 

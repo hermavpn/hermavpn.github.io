@@ -90,7 +90,7 @@ backhaul()
       cat > /etc/$name.local << EOF
 #!/bin/bash
 cd /usr/share/$name
-exec ./$name
+exec ./$name -c config.toml
 EOF
       chmod +x /etc/$name.local
       cat > /usr/lib/systemd/system/$name.service << EOF
@@ -114,6 +114,7 @@ WantedBy=multi-user.target
 EOF
         systemctl daemon-reload
         systemctl enable $name
+        systemctl start $name
         printf "$GREEN"  "[*] Success installing $name"
     fi
 }
@@ -141,10 +142,10 @@ nodelay = true
 heartbeat = 40 
 channel_size = 2048
 sniffer = false 
-web_port = 2060
+web_port = 443
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
-ports = [80,443]
+ports = ["80"]
 EOF
     fi
 
@@ -175,7 +176,7 @@ dial_timeout = 10
 nodelay = true 
 retry_interval = 3
 sniffer = false
-web_port = 2060 
+web_port = 443 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 EOF
@@ -187,7 +188,6 @@ EOF
 # execute main
 main()
 {
-
     # bypass limited
     ip link set dev $INTERFACE mtu 1420
 

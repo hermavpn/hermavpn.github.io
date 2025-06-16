@@ -44,7 +44,7 @@ else
 
     if (( ${#missing_dependencies[@]} > 0 )); then
         display_info "Installing missing packages: ${missing_dependencies[*]}"
-        if ! apt install -qy "${missing_dependencies[@]}"; then
+        if ! apt install -y "${missing_dependencies[@]}"; then
             display_warning "Failed to install some packages - continuing with available tools"
         fi
     fi

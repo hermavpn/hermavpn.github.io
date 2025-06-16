@@ -1,14 +1,15 @@
 #!/bin/bash
 ver="2.0"
 
-# color variables
-RED="\e[1;31m%s\e[0m\n"
-GREEN="\e[1;32m%s\e[0m\n"
-YELLOW="\e[1;33m%s\e[0m\n"
-BLUE="\e[1;34m%s\e[0m\n"
-MAGENTO="\e[1;35m%s\e[0m\n"
-CYAN="\e[1;36m%s\e[0m\n"
-WHITE="\e[1;37m%s\e[0m\n"
+# Color definitions
+readonly GREEN="\033[32m"
+readonly WHITE="\033[37m"
+readonly RED="\033[31m"
+readonly BLUE="\033[34m"
+readonly YELLOW="\033[33m"
+readonly CYAN="\033[36m"
+readonly MAGENTA="\033[35m"
+readonly RESET="\033[0m"
 
 # endpoint variables
 ENTRYPOINT="$1"
@@ -20,60 +21,85 @@ if [ "$(id -u)" != "0" ];then
     printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
     exit 0
 else
-    # update & upgrade & dist-upgrade
-    apt update;apt upgrade -y;apt dist-upgrade -y;apt autoremove -y;apt autoclean
+    # update apt
+    apt -qq update
+    
+    # Install dependencies with better error handling
+    local -a apt_dependencies=(
+        "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
+        "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils"
+    )
 
-    # init requirements
-    apt install -y wget curl git net-tools gnupg apt-transport-https nload htop speedtest-cli fail2ban cron iftop zip tcptrack nano dnsutils  
-    OS=`uname -m`
-    USERS=$(users | awk '{print $1}')
-    LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-    DOM_ONE=$(echo $ENDPOINT | awk -F. '{print $2}')
-    DOM_TWO=$(echo $ENTRYPOINT | awk -F. '{print $3}')
-    DOMAIN=$(echo "$DOM_ONE.$DOM_TWO")
-    IP_ENDPOINT=$(dig -4 +short $ENDPOINT)
-    IP_ENTRYPOINT=$(dig -4 +short $ENTRYPOINT)
-    INTERFACE=$(ip r | head -1 | cut -d " " -f5)
+    # Check and install missing dependencies with improved checking
+    local -a missing_dependencies=()
+    for dep in "${apt_dependencies[@]}"; do
+        # Check if package is installed using dpkg-query
+        if ! dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "installed"; then
+            # Double check if command exists in PATH
+            if ! command -v "$dep" &>/dev/null; then
+                missing_dependencies+=("$dep")
+            fi
+        fi
+    done
+
+    if (( ${#missing_dependencies[@]} > 0 )); then
+        display_info "Installing missing packages: ${missing_dependencies[*]}"
+        if ! apt install -qy "${missing_dependencies[@]}"; then
+            display_warning "Failed to install some packages - continuing with available tools"
+        fi
+    fi
 fi
 
-# unk9vvn logo
-logo ()
+# global variables
+OS=`uname -m`
+USERS=$(users | awk '{print $1}')
+LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+DOM_ONE=$(echo $ENDPOINT | awk -F. '{print $2}')
+DOM_TWO=$(echo $ENTRYPOINT | awk -F. '{print $3}')
+DOMAIN=$(echo "$DOM_ONE.$DOM_TWO")
+IP_ENDPOINT=$(dig -4 +short $ENDPOINT)
+IP_ENTRYPOINT=$(dig -4 +short $ENTRYPOINT)
+INTERFACE=$(ip r | head -1 | cut -d " " -f5)
+
+# Display ASCII art logo
+logo()
 {
-    reset;clear
-    printf "$GREEN"   "                            --/osssssssssssso/--                    "
-    printf "$GREEN"   "                        -+sss+-+--os.yo:++/.o-/sss+-                "
-    printf "$GREEN"   "                     /sy+++-.h.-dd++m+om/s.h.hy/:+oys/              "
-    printf "$GREEN"   "                  .sy/// h/h-:d-y:/+-/+-+/-s/sodooh:///ys.          "
-    printf "$GREEN"   "                -ys-ss/:y:so-/osssso++++osssso+.oo+/s-:o.sy-        "
-    printf "$GREEN"   "              -ys:oossyo/+oyo/:-:.-:.:/.:/-.-:/syo/+/s+:oo:sy-      "
-    printf "$GREEN"   "             /d/:-soh/-+ho-.:::--:- .os: -:-.:-/::sy+:+ysso+:d/     "
-    printf "$GREEN"   "            sy-..+oo-+h:--:..hy+y/  :s+.  /y/sh..:/-:h+-oyss:.ys    "
-    printf "$WHITE"   "           ys :+oo/:d/   .m-yyyo/- - -:   .+oyhy-N.   /d::yosd.sy   "
-    printf "$WHITE"   "          oy.++++//d.  ::oNdyo:     .--.     :oyhN+-:  .d//s//y.ys  "
-    printf "$WHITE"   "         :m-y+++//d-   dyyy++::-. -.o.-+.- .-::/+hsyd   -d/so+++.m: "
-    printf "$WHITE"   "        -d/-/+++.m-  /.ohso- ://:///++++///://:  :odo.+  -m.syoo:/d-"
-    printf "$WHITE"   "        :m-+++y:y+   smyms-   -//+/-ohho-/+//-    omsmo   +y s+oy-m:"
-    printf "$WHITE"   "        sy:+++y-N-  -.dy+:...-- :: ./hh/. :: --...//hh.:  -N-o+/:-so"
-    printf "$WHITE"   "        yo-///s-m   odohd.-.--:/o.-+/::/+-.o/:--.--hd:ho   m-s+++-+y"
-    printf "$WHITE"   "        yo::/+o-m   -yNy/:  ...:+s.//:://.s+:...  :/yNs    m-h++++oy"
-    printf "$WHITE"   "        oy/hsss-N-  oo:oN-   .-o.:ss:--:ss:.o-.   -My-oo  -N-o+++.so"
-    printf "$WHITE"   "        :m :++y:y+   sNMy+: -+/:.--:////:--.:/+- -+hNNs   +y-o++o-m:"
-    printf "$WHITE"   "        -d/::+o+.m-  -:/+ho:.       -//-       ./sdo::-  -m-o++++/d-"
-    printf "$WHITE"   "         :m-yo++//d- -ommMo//        -:        +oyNhmo- -d//s+++-m: "
-    printf "$WHITE"   "          oy /o++//d.  -::/oMss-   -+++s     :yNy+/:   .d//y+---ys  "
-    printf "$WHITE"   "           ys--+o++:d/ -/sdmNysNs+/./-//-//hNyyNmmy+- /d-+y--::sy   "
-    printf "$RED"     "            sy:..ooo-+h/--.-//odm/hNh--yNh+Ndo//-./:/h+-so+:+/ys    "
-    printf "$RED"     "             /d-o.ssy+-+yo:/:/:-:+sho..ohs/-:://::oh+.h//syo-d/     "
-    printf "$RED"     "              -ys-oosyss:/oyy//::..-.--.--:/.//syo+-ys//o/.sy-      "
-    printf "$RED"     "                -ys.sooh+d-s:+osssysssosssssso:/+/h:/yy/.sy-        "
-    printf "$RED"     "                  .sy/:os.h--d/o+-/+:o:/+.+o:d-y+h-o+-+ys.          "
-    printf "$RED"     "                     :sy+:+ s//sy-y.-h-m/om:s-y.++/+ys/             "
-    printf "$RED"     "                        -+sss+/o/ s--y.s+/:++-+sss+-                "
-    printf "$RED"     "                            --/osssssssssssso/--                    "
-    printf "$BLUE"    "                                  Unk9vvN                           "
-    printf "$YELLOW"  "                             hermavpn.github.io                     "
-    printf "$CYAN"    "                               hermavpn "$ver"                      "
-    printf "\n\n"
+    reset
+    clear
+    echo -e  "${GREEN}                            --/osssssssssssso/--                    "
+    echo -e  "${GREEN}                        -+sss+-+--os.yo:++/.o-/sss+-                "
+    echo -e  "${GREEN}                     /sy+++-.h.-dd++m+om/s.h.hy/:+oys/              "
+    echo -e  "${GREEN}                  .sy/// h/h-:d-y:/+-/+-+/-s/sodooh:///ys.          "
+    echo -e  "${GREEN}                -ys-ss/:y:so-/osssso++++osssso+.oo+/s-:o.sy-        "
+    echo -e  "${GREEN}              -ys:oossyo/+oyo/:-:.-:.:/.:/-.-:/syo/+/s+:oo:sy-      "
+    echo -e  "${GREEN}             /d/:-soh/-+ho-.:::--:- .os: -:-.:-/::sy+:+ysso+:d/     "
+    echo -e  "${GREEN}            sy-..+oo-+h:--:..hy+y/  :s+.  /y/sh..:/-:h+-oyss:.ys    "
+    echo -e  "${WHITE}           ys :+oo/:d/   .m-yyyo/- - -:   .+oyhy-N.   /d::yosd.sy   "
+    echo -e  "${WHITE}          oy.++++//d.  ::oNdyo:     .--.     :oyhN+-:  .d//s//y.ys  "
+    echo -e  "${WHITE}         :m-y+++//d-   dyyy++::-. -.o.-+.- .-::/+hsyd   -d/so+++.m: "
+    echo -e  "${WHITE}        -d/-/+++.m-  /.ohso- ://:///++++///://:  :odo.+  -m.syoo:/d-"
+    echo -e  "${WHITE}        :m-+++y:y+   smyms-   -//+/-ohho-/+//-    omsmo   +y s+oy-m:"
+    echo -e  "${WHITE}        sy:+++y-N-  -.dy+:...-- :: ./hh/. :: --...//hh.:  -N-o+/:-so"
+    echo -e  "${WHITE}        yo-///s-m   odohd.-.--:/o.-+/::/+-.o/:--.--hd:ho   m-s+++-+y"
+    echo -e  "${WHITE}        yo::/+o-m   -yNy/:  ...:+s.//:://.s+:...  :/yNs    m-h++++oy"
+    echo -e  "${WHITE}        oy/hsss-N-  oo:oN-   .-o.:ss:--:ss:.o-.   -My-oo  -N-o+++.so"
+    echo -e  "${WHITE}        :m :++y:y+   sNMy+: -+/:.--:////:--.:/+- -+hNNs   +y-o++o-m:"
+    echo -e  "${WHITE}        -d/::+o+.m-  -:/+ho:.       -//-       ./sdo::-  -m-o++++/d-"
+    echo -e  "${WHITE}         :m-yo++//d- -ommMo//        -:        +oyNhmo- -d//s+++-m: "
+    echo -e  "${WHITE}          oy /o++//d.  -::/oMss-   -+++s     :yNy+/:   .d//y+---ys  "
+    echo -e  "${WHITE}           ys--+o++:d/ -/sdmNysNs+/./-//-//hNyyNmmy+- /d-+y--::sy   "
+    echo -e    "${RED}            sy:..ooo-+h/--.-//odm/hNh--yNh+Ndo//-./:/h+-so+:+/ys    "
+    echo -e    "${RED}             /d-o.ssy+-+yo:/:/:-:+sho..ohs/-:://::oh+.h//syo-d/     "
+    echo -e    "${RED}              -ys-oosyss:/oyy//::..-.--.--:/.//syo+-ys//o/.sy-      "
+    echo -e    "${RED}                -ys.sooh+d-s:+osssysssosssssso:/+/h:/yy/.sy-        "
+    echo -e    "${RED}                  .sy/:os.h--d/o+-/+:o:/+.+o:d-y+h-o+-+ys.          "
+    echo -e    "${RED}                     :sy+:+ s//sy-y.-h-m/om:s-y.++/+ys/             "
+    echo -e    "${RED}                        -+sss+/o/ s--y.s+/:++-+sss+-                "
+    echo -e    "${RED}                            --/osssssssssssso/--                    "
+    echo -e   "${BLUE}                                  HermaVPN                          "
+    echo -e "${YELLOW}                         https://hermavpn.github.io                 "
+    echo -e   "${CYAN}                                HermaVPN "$VER"                     "
+    echo -e "\n"
 }
 
 # install backhaul
@@ -192,12 +218,6 @@ main()
     # bypass limited
     ip link set dev $INTERFACE mtu 1420
 
-    # resolv fixed
-    if ! grep -q "nameserver 8.8.8.8" /etc/resolv.conf; then
-        echo "nameserver 8.8.4.4" > /etc/resolv.conf
-        echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-    fi
-
     # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
@@ -209,14 +229,18 @@ main()
     fi
 
     # Configure DNS with error handling
-    if ! grep -q "nameserver 178.22.122.100" /etc/resolv.conf 2>/dev/null; then
+    if ! grep -q "nameserver 178.22.122.100" /etc/resolv.conf; then
         echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" > /etc/resolv.conf
         chattr +i /etc/resolv.conf 2>/dev/null
+    fi
+
+    # Configure DNS with error handling
+    if ! grep -q "185.199.108.133" /etc/hosts; then
         cat > /etc/hosts << EOF
 185.199.108.133 raw.githubusercontent.com
 185.125.190.36 archive.ubuntu.com
 185.125.190.39 security.ubuntu.com
-EOF     
+EOF
     fi
 
     # Initialize fail2ban

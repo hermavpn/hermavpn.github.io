@@ -352,7 +352,6 @@ arguments()
 {
     if [ -z "$1" ]; then
         error "sudo hermavpn \$endpoint \$entrypoint"
-        exit 1
     elif [ -z "$2" ]; then
         error "sudo hermavpn \$endpoint \$entrypoint"
     fi

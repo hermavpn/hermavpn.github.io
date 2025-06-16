@@ -231,7 +231,7 @@ main()
     if ! grep -q "nameserver 178.22.122.100" /etc/resolv.conf; then
         echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" > /etc/resolv.conf
         chattr +i /etc/resolv.conf 2>/dev/null
-        success "setting host shecan.ir"
+        success "setting nameserver shecan.ir"
     fi
 
     # Configure DNS with error handling

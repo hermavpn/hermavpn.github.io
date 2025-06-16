@@ -249,10 +249,8 @@ EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/$name/bandwith.sh << 'EOF'
 #!/bin/bash
-
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
-
 # Run the speed test and parse the download speed
 if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
@@ -265,6 +263,7 @@ if command -v speedtest-cli >/dev/null 2>&1; then
 fi
 EOF
         chmod +x /usr/share/$name/bandwith.sh
+        (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
         local name="hermavpn"
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
@@ -276,10 +275,8 @@ EOF
         chmod +x /usr/bin/$name
         cat > /usr/share/$name/bandwith.sh << 'EOF'
 #!/bin/bash
-
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
-
 # Run the speed test and parse the download speed
 if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
@@ -292,10 +289,9 @@ if command -v speedtest-cli >/dev/null 2>&1; then
 fi
 EOF
         chmod +x /usr/share/$name/bandwith.sh
+        (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
         bash /usr/share/$name/$name.sh
     fi
-
-    echo "0 * * * * /usr/share/hermavpn/bandwith.sh" | crontab -
 }
 
 

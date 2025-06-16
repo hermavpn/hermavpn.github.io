@@ -43,33 +43,9 @@ if [ "$(id -u)" != "0" ];then
     printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
     exit 0
 else
-    # update apt
+    # install ifconfig
     apt -qq update
-
-    # Install dependencies with better error handling
-    apt_dependencies=(
-        "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
-        "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils"
-    )
-
-    # Check and install missing dependencies with improved checking
-    missing_dependencies=()
-    for dep in "${apt_dependencies[@]}"; do
-        # Check if package is installed using dpkg-query
-        if ! dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "installed"; then
-            # Double check if command exists in PATH
-            if ! command -v "$dep" &>/dev/null; then
-                missing_dependencies+=("$dep")
-            fi
-        fi
-    done
-
-    if (( ${#missing_dependencies[@]} > 0 )); then
-        info "Installing missing packages: ${missing_dependencies[*]}"
-        if ! apt install -y "${missing_dependencies[@]}"; then
-            warning "Failed to install some packages - continuing with available tools"
-        fi
-    fi
+    apt install -qy net-tools
 fi
 
 # global variables
@@ -244,7 +220,7 @@ main()
     # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
-        success "fixing apt germany"
+        success "fixing apt iran"
     fi
 
     # apt fixed germany
@@ -268,6 +244,31 @@ main()
 185.125.190.39 security.ubuntu.com
 EOF
         success "setting host shecan.ir"
+    fi
+
+    # Install dependencies with better error handling
+    apt_dependencies=(
+        "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
+        "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils"
+    )
+
+    # Check and install missing dependencies with improved checking
+    missing_dependencies=()
+    for dep in "${apt_dependencies[@]}"; do
+        # Check if package is installed using dpkg-query
+        if ! dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "installed"; then
+            # Double check if command exists in PATH
+            if ! command -v "$dep" &>/dev/null; then
+                missing_dependencies+=("$dep")
+            fi
+        fi
+    done
+
+    if (( ${#missing_dependencies[@]} > 0 )); then
+        info "Installing missing packages: ${missing_dependencies[*]}"
+        if ! apt install -y "${missing_dependencies[@]}"; then
+            warning "Failed to install some packages - continuing with available tools"
+        fi
     fi
 
     # Initialize fail2ban

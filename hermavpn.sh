@@ -65,7 +65,7 @@ else
     done
 
     if (( ${#missing_dependencies[@]} > 0 )); then
-        display_info "Installing missing packages: ${missing_dependencies[*]}"
+        info "Installing missing packages: ${missing_dependencies[*]}"
         if ! apt install -y "${missing_dependencies[@]}"; then
             warning "Failed to install some packages - continuing with available tools"
         fi

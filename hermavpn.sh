@@ -11,6 +11,28 @@ readonly CYAN="\033[36m"
 readonly MAGENTA="\033[35m"
 readonly RESET="\033[0m"
 
+# Message display functions
+error()
+{
+    echo -e "${RED}[-] Error: $1${RESET}" >&2
+    exit 1
+}
+
+success()
+{
+    echo -e "${GREEN}[+] $1${RESET}"
+}
+
+warning()
+{
+    echo -e "${YELLOW}[!] $1${RESET}"
+}
+
+info()
+{
+    echo -e "${BLUE}[*] $1${RESET}"
+}
+
 # endpoint variables
 ENTRYPOINT="$1"
 ENDPOINT="$2"
@@ -23,15 +45,15 @@ if [ "$(id -u)" != "0" ];then
 else
     # update apt
     apt -qq update
-    
+
     # Install dependencies with better error handling
-    local -a apt_dependencies=(
+    apt_dependencies=(
         "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
         "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils"
     )
 
     # Check and install missing dependencies with improved checking
-    local -a missing_dependencies=()
+    missing_dependencies=()
     for dep in "${apt_dependencies[@]}"; do
         # Check if package is installed using dpkg-query
         if ! dpkg-query -W -f='${Status}' "$dep" 2>/dev/null | grep -q "installed"; then
@@ -45,7 +67,7 @@ else
     if (( ${#missing_dependencies[@]} > 0 )); then
         display_info "Installing missing packages: ${missing_dependencies[*]}"
         if ! apt install -y "${missing_dependencies[@]}"; then
-            display_warning "Failed to install some packages - continuing with available tools"
+            warning "Failed to install some packages - continuing with available tools"
         fi
     fi
 fi
@@ -96,9 +118,9 @@ logo()
     echo -e    "${RED}                     :sy+:+ s//sy-y.-h-m/om:s-y.++/+ys/             "
     echo -e    "${RED}                        -+sss+/o/ s--y.s+/:++-+sss+-                "
     echo -e    "${RED}                            --/osssssssssssso/--                    "
-    echo -e   "${BLUE}                                  HermaVPN                          "
+    echo -e   "${BLUE}                                  Unk9vvN                           "
     echo -e "${YELLOW}                         https://hermavpn.github.io                 "
-    echo -e   "${CYAN}                                HermaVPN "$VER"                     "
+    echo -e   "${CYAN}                                HermaVPN "$ver"                     "
     echo -e "\n"
 }
 
@@ -140,8 +162,7 @@ WantedBy=multi-user.target
 EOF
         systemctl daemon-reload
         systemctl enable $name
-        systemctl start $name
-        printf "$GREEN"  "[*] Success installing $name"
+        success "Success installing $name"
     fi
 }
 
@@ -177,6 +198,7 @@ ports = [
 EOF
     fi
 
+    success "entrypoint success config"
     exit 0
 }
 
@@ -209,6 +231,7 @@ log_level = "info"
 EOF
     fi
 
+    success "endpoint success config"
     exit 0
 }
 
@@ -221,17 +244,20 @@ main()
     # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
+        success "fixing apt germany"
     fi
 
     # apt fixed germany
     if grep -q "de.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|de.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
+        success "fixing apt germany"
     fi
 
     # Configure DNS with error handling
     if ! grep -q "nameserver 178.22.122.100" /etc/resolv.conf; then
         echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" > /etc/resolv.conf
         chattr +i /etc/resolv.conf 2>/dev/null
+        success "setting host shecan.ir"
     fi
 
     # Configure DNS with error handling
@@ -241,6 +267,7 @@ main()
 185.125.190.36 archive.ubuntu.com
 185.125.190.39 security.ubuntu.com
 EOF
+        success "setting host shecan.ir"
     fi
 
     # Initialize fail2ban
@@ -258,6 +285,7 @@ ignoreip = 127.0.0.1/8 ::1
 EOF
         systemctl daemon-reload
         systemctl enable fail2ban
+        success "Success installing fail2ban"
     fi
 
     # install hermavpn
@@ -288,6 +316,7 @@ fi
 EOF
         chmod +x /usr/share/$name/bandwith.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
+        success "Success installing $name"
     elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
         local name="hermavpn"
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
@@ -314,6 +343,7 @@ fi
 EOF
         chmod +x /usr/share/$name/bandwith.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
+        success "Success updating $name"
         bash /usr/share/$name/$name.sh
     fi
 }
@@ -322,12 +352,12 @@ EOF
 arguments()
 {
     if [ -z "$1" ]; then
-        printf "$RED"       "[X] The Entrypoint Server has not been entered."
-        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        error "The Entrypoint Server has not been entered."
+        error "sudo hermavpn \$endpoint \$entrypoint"
         exit 1
     elif [ -z "$2" ]; then
-        printf "$RED"       "[X] The Endpoint Server has not been entered."
-        printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
+        error "The Endpoint Server has not been entered."
+        error "sudo hermavpn \$endpoint \$entrypoint"
         exit 1
     fi
 }
@@ -342,10 +372,10 @@ do
     case $opt in
         "Endpoint"|"Entrypoint")
             arguments "$1" "$2"
-            printf "$GREEN"  "[*] Running $opt Tunnel..."
+            info "Running $opt Tunnel..."
             "${opt,,}";;
         "Exit")
-            echo "Exiting..."
+            error "Exiting..."
             break;;
         *) echo "invalid option...";;
     esac

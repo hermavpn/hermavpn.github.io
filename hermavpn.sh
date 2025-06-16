@@ -39,9 +39,7 @@ ENDPOINT="$2"
 
 # root checks 
 if [ "$(id -u)" != "0" ];then
-    printf "$RED"		"[X] Please run as ROOT..."
-    printf "$GREEN"     "[*] sudo hermavpn \$endpoint \$entrypoint"
-    exit 0
+    error "sudo hermavpn \$endpoint \$entrypoint"
 else
     # install ifconfig
     apt -qq update
@@ -353,13 +351,10 @@ EOF
 arguments()
 {
     if [ -z "$1" ]; then
-        error "The Entrypoint Server has not been entered."
         error "sudo hermavpn \$endpoint \$entrypoint"
         exit 1
     elif [ -z "$2" ]; then
-        error "The Endpoint Server has not been entered."
         error "sudo hermavpn \$endpoint \$entrypoint"
-        exit 1
     fi
 }
 

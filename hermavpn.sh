@@ -229,13 +229,17 @@ entrypoint_tcpmux()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "tcpmux"
-accept_udp = false
-token = "00980098"
+token = "00980098" 
 keepalive_period = 75
-nodelay = true
-heartbeat = 40
+nodelay = true 
+heartbeat = 40 
 channel_size = 2048
-sniffer = false
+mux_con = 8
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536 
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 ports = [
@@ -255,14 +259,18 @@ endpoint_tcpmux()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcpmux"
-token = "00980098"
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
-nodelay = true
 retry_interval = 3
-sniffer = false
+nodelay = true 
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536 
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 EOF
@@ -277,11 +285,8 @@ entrypoint_udp()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "udp"
-accept_udp = true
 token = "00980098"
-keepalive_period = 75
-nodelay = true
-heartbeat = 40
+heartbeat = 20 
 channel_size = 2048
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
@@ -303,12 +308,9 @@ endpoint_udp()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "udp"
-token = "00980098"
+token = "your_token" 
 connection_pool = 8
 aggressive_pool = false
-keepalive_period = 75
-dial_timeout = 10
-nodelay = true
 retry_interval = 3
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
@@ -325,13 +327,12 @@ entrypoint_ws()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "ws"
-accept_udp = false
-token = "00980098"
-keepalive_period = 75
-nodelay = true
-heartbeat = 40
+token = "00980098" 
 channel_size = 2048
-sniffer = false
+keepalive_period = 75 
+heartbeat = 40
+nodelay = true 
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 ports = [
@@ -351,14 +352,14 @@ endpoint_ws()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "ws"
-token = "00980098"
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
-keepalive_period = 75
+keepalive_period = 75 
 dial_timeout = 10
-nodelay = true
 retry_interval = 3
-sniffer = false
+nodelay = true 
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 EOF
@@ -366,19 +367,25 @@ EOF
     start_backhaul
 }
 
-# Websocket Secure
+# Secure Websocket
 entrypoint_wss()
 {
+    # generate certs
+    openssl genpkey -algorithm RSA -out /usr/share/backhaul/server.key -pkeyopt rsa_keygen_bits:2048
+    openssl req -new -key /usr/share/backhaul/server.key \
+            -out /usr/share/backhaul/server.csr \
+            -subj "/C=US/ST=California/L=San Francisco/O=Your Company Name/CN=example.com"
+
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wss"
-accept_udp = false
-token = "00980098"
-keepalive_period = 75
-nodelay = true
-heartbeat = 40
+token = "your_token" 
 channel_size = 2048
+keepalive_period = 75 
+nodelay = true 
+tls_cert = "/usr/share/backhaul/server.crt"      
+tls_key = "/usr/share/backhaul//server.key"
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
@@ -392,21 +399,21 @@ EOF
     start_backhaul
 }
 
-# Websocket Secure
+# Secure Websocket
 endpoint_wss()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wss"
-token = "00980098"
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
-nodelay = true
-retry_interval = 3
-sniffer = false
+retry_interval = 3  
+nodelay = true 
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 EOF
@@ -421,12 +428,16 @@ entrypoint_wsmux()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wsmux"
-accept_udp = false
-token = "00980098"
+token = "00980098" 
 keepalive_period = 75
-nodelay = true
-heartbeat = 40
+nodelay = true 
+heartbeat = 40 
 channel_size = 2048
+mux_con = 8
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536 
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
@@ -447,13 +458,17 @@ endpoint_wsmux()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wsmux"
-token = "00980098"
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
 nodelay = true
 retry_interval = 3
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536 
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
@@ -462,20 +477,32 @@ EOF
     start_backhaul
 }
 
-# Websocket Secure MUX
+# Secure Websocket MUX
 entrypoint_wssmux()
 {
+    # generate certs
+    openssl genpkey -algorithm RSA -out /usr/share/backhaul/server.key -pkeyopt rsa_keygen_bits:2048
+    openssl req -new -key /usr/share/backhaul/server.key \
+            -out /usr/share/backhaul/server.csr \
+            -subj "/C=US/ST=California/L=San Francisco/O=Your Company Name/CN=example.com"
+
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wssmux"
-accept_udp = false
-token = "00980098"
+token = "00980098" 
 keepalive_period = 75
-nodelay = true
-heartbeat = 40
+nodelay = true 
+heartbeat = 40 
 channel_size = 2048
-sniffer = false
+mux_con = 8
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536 
+tls_cert = "/usr/share/backhaul/server.crt"      
+tls_key = "/usr/share/backhaul/server.key"
+sniffer = false 
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 ports = [
@@ -488,20 +515,24 @@ EOF
     start_backhaul
 }
 
-# Websocket Secure MUX
+# Secure Websocket MUX
 endpoint_wssmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wssmux"
-token = "00980098"
-connection_pool = 8
-aggressive_pool = false
+token = "00980098" 
 keepalive_period = 75
 dial_timeout = 10
 nodelay = true
 retry_interval = 3
+connection_pool = 8
+aggressive_pool = false
+mux_version = 1
+mux_framesize = 32768 
+mux_recievebuffer = 4194304
+mux_streambuffer = 65536  
 sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
@@ -639,7 +670,7 @@ EOF
 
     # Install dependencies with better error handling (added bc)
     apt_dependencies=(
-        "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
+        "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https" "openssl"
         "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils" "bc"
     )
 

@@ -191,6 +191,7 @@ sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 ports = [
+    "22=127.0.0.1:22",
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
 ]

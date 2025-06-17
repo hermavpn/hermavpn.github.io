@@ -50,12 +50,19 @@ fi
 OS=`uname -m`
 USERS=$(users | awk '{print $1}')
 LAN=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-DOM_ONE=$(echo $ENDPOINT | awk -F. '{print $2}')
-DOM_TWO=$(echo $ENTRYPOINT | awk -F. '{print $3}')
-DOMAIN=$(echo "$DOM_ONE.$DOM_TWO")
-IP_ENDPOINT=$(dig -4 +short $ENDPOINT)
-IP_ENTRYPOINT=$(dig -4 +short $ENTRYPOINT)
-INTERFACE=$(ip r | head -1 | cut -d " " -f5)
+
+# Fix domain extraction logic
+if [[ "$ENDPOINT" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    # If ENDPOINT is IP, use ENTRYPOINT for domain
+    DOMAIN=$(echo "$ENTRYPOINT" | cut -d. -f2-)
+else
+    # If ENDPOINT is domain, use it
+    DOMAIN=$(echo "$ENDPOINT" | cut -d. -f2-)
+fi
+
+IP_ENDPOINT=$(dig -4 +short $ENDPOINT 2>/dev/null | head -1)
+IP_ENTRYPOINT=$(dig -4 +short $ENTRYPOINT 2>/dev/null | head -1)
+INTERFACE=$(ip r | head -1 | cut -d " " -f5 2>/dev/null)
 
 # Display ASCII art logo
 logo()
@@ -104,17 +111,24 @@ backhaul()
     if [ ! -d "/usr/share/backhaul" ]; then
       local name="backhaul"
       mkdir -p /usr/share/$name
-      wget https://github.com/Musixal/Backhaul/releases/latest/download/backhaul_linux_amd64.tar.gz -O /tmp/$name.tar.gz
+      
+      # Download with better error handling
+      if ! wget -q https://github.com/Musixal/Backhaul/releases/latest/download/backhaul_linux_amd64.tar.gz -O /tmp/$name.tar.gz; then
+          error "Failed to download backhaul"
+      fi
+      
       tar -xzf /tmp/$name.tar.gz -C /usr/share/$name
       chmod 755 /usr/share/$name/*
       ln -fs /usr/share/$name/backhaul /usr/bin/$name
       chmod +x /usr/bin/$name
+      
       cat > /etc/$name.local << EOF
 #!/bin/bash
 cd /usr/share/$name
 exec ./$name -c config.toml
 EOF
       chmod +x /etc/$name.local
+      
       cat > /usr/lib/systemd/system/$name.service << EOF
 [Unit]
 Description=$name Tunneling
@@ -140,55 +154,55 @@ EOF
     fi
 }
 
-# entrypoint server
-entrypoint()
+# Function to start backhaul service
+start_backhaul()
 {
-    # Initialize hostname
-    if ! grep -q "entrypoint" /etc/hostname; then
-        echo "entrypoint" > /etc/hostname
+    if systemctl is-active --quiet backhaul; then
+        systemctl restart backhaul
+        success "Backhaul service restarted"
+    else
+        systemctl start backhaul
+        success "Backhaul service started"
     fi
+    
+    # Show service status
+    sleep 2
+    if systemctl is-active --quiet backhaul; then
+        success "Backhaul is running successfully"
+    else
+        warning "Backhaul service failed to start. Check logs with: journalctl -u backhaul"
+    fi
+}
 
-    # install backhaul
-    backhaul
-
-    if [ ! -f "/usr/share/backhaul/config.toml" ]; then
-        cat > /usr/share/backhaul/config.toml << EOF
+# TCP
+entrypoint_tcp()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "tcp"
-accept_udp = false 
+accept_udp = false
 token = "00980098"
-keepalive_period = 75  
-nodelay = true 
-heartbeat = 40 
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
 channel_size = 2048
-sniffer = false 
+sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 ports = [
-    "80=127.0.0.1:80",     # HTTP traffic
-    "443=127.0.0.1:443"    # HTTPS/VLESS traffic
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
 ]
 EOF
-    fi
-
-    success "entrypoint success config"
-    exit 0
+    success "Configuration Success $1"
+    start_backhaul
 }
 
-# endpoint server
-endpoint()
+# TCP
+endpoint_tcp()
 {
-    # Initialize hostname
-    if ! grep -q "endpoint" /etc/hostname; then
-        echo "endpoint" > /etc/hostname
-    fi
-
-    # install backhaul
-    backhaul
-
-    if [ ! -f "/usr/share/backhaul/config.toml" ]; then
-        cat > /usr/share/backhaul/config.toml << EOF
+    cat > /usr/share/backhaul/config.toml << EOF
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcp"
@@ -203,17 +217,395 @@ sniffer = false
 sniffer_log = "/usr/share/backhaul/backhaul.json"
 log_level = "info"
 EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# TCPMUX
+entrypoint_tcpmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "tcpmux"
+accept_udp = false
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# TCPMUX
+endpoint_tcpmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "tcpmux"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# UDP
+entrypoint_udp()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "udp"
+accept_udp = true
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# UDP
+endpoint_udp()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "udp"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket
+entrypoint_ws()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "ws"
+accept_udp = false
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket
+endpoint_ws()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "ws"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket Secure
+entrypoint_wss()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "wss"
+accept_udp = false
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket Secure
+endpoint_wss()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "wss"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket MUX
+entrypoint_wsmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "wsmux"
+accept_udp = false
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket MUX
+endpoint_wsmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "wsmux"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket Secure MUX
+entrypoint_wssmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[server]
+bind_addr = "0.0.0.0:8080"
+transport = "wssmux"
+accept_udp = false
+token = "00980098"
+keepalive_period = 75
+nodelay = true
+heartbeat = 40
+channel_size = 2048
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+ports = [
+    "22=127.0.0.1:22",
+    "80=127.0.0.1:80",
+    "443=127.0.0.1:443"
+]
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Websocket Secure MUX
+endpoint_wssmux()
+{
+    cat > /usr/share/backhaul/config.toml << EOF
+[client]
+remote_addr = "$IP_ENTRYPOINT:8080"
+transport = "wssmux"
+token = "00980098"
+connection_pool = 8
+aggressive_pool = false
+keepalive_period = 75
+dial_timeout = 10
+nodelay = true
+retry_interval = 3
+sniffer = false
+sniffer_log = "/usr/share/backhaul/backhaul.json"
+log_level = "info"
+EOF
+    success "Configuration Success $1"
+    start_backhaul
+}
+
+# Function to select tunneling protocol
+select_protocol()
+{
+    local service_type=$1
+    info "Select Tunneling Protocol for $service_type"
+    select protocol_opt in "TCP" "TCPMUX" "UDP" "WS" "WSS" "WSMUX" "WSSMUX" "Back to Main Menu"
+    do
+        case $protocol_opt in
+            "TCP")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_tcp "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_tcp "$service_type"
+                fi
+                break;;
+            "TCPMUX")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_tcpmux "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_tcpmux "$service_type"
+                fi
+                break;;
+            "UDP")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_udp "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_udp "$service_type"
+                fi
+                break;;
+            "WS")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_ws "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_ws "$service_type"
+                fi
+                break;;
+            "WSS")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_wss "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_wss "$service_type"
+                fi
+                break;;
+            "WSMUX")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_wsmux "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_wsmux "$service_type"
+                fi
+                break;;
+            "WSSMUX")
+                if [ "$service_type" = "endpoint" ]; then
+                    endpoint_wssmux "$service_type"
+                elif [ "$service_type" = "entrypoint" ]; then
+                    entrypoint_wssmux "$service_type"
+                fi
+                break;;
+            "Back to Main Menu")
+                break;;
+            *) error "Invalid option: $REPLY. Please choose a valid protocol.";;
+        esac
+    done
+}
+
+# entrypoint server
+entrypoint()
+{
+    # Initialize hostname
+    if ! grep -q "entrypoint" /etc/hostname; then
+        echo "entrypoint" > /etc/hostname
+        hostname entrypoint
     fi
 
-    success "endpoint success config"
-    exit 0
+    # install backhaul
+    backhaul
+}
+
+# endpoint server
+endpoint()
+{
+    # Initialize hostname
+    if ! grep -q "endpoint" /etc/hostname; then
+        echo "endpoint" > /etc/hostname
+        hostname endpoint
+    fi
+
+    # install backhaul
+    backhaul
 }
 
 # execute main
 main()
 {
-    # bypass limited
-    ip link set dev $INTERFACE mtu 1420
+    # bypass limited (with error handling)
+    if [ -n "$INTERFACE" ]; then
+        ip link set dev $INTERFACE mtu 1420 2>/dev/null || warning "Failed to set MTU"
+    fi
 
     # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
@@ -244,10 +636,10 @@ EOF
         success "setting host shecan.ir"
     fi
 
-    # Install dependencies with better error handling
+    # Install dependencies with better error handling (added bc)
     apt_dependencies=(
         "net-tools" "wget" "curl" "git" "jq" "unzip" "zip" "gnupg" "apt-transport-https"
-        "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils"
+        "nload" "htop" "speedtest-cli" "fail2ban" "cron" "iftop" "tcptrack" "nano" "dnsutils" "bc"
     )
 
     # Check and install missing dependencies with improved checking
@@ -284,6 +676,7 @@ ignoreip = 127.0.0.1/8 ::1
 EOF
         systemctl daemon-reload
         systemctl enable fail2ban
+        systemctl start fail2ban 2>/dev/null
         success "Success installing fail2ban"
     fi
 
@@ -298,7 +691,8 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/$name/bandwith.sh << 'EOF'
+        # Fixed filename: bandwidth.sh (not bandwith.sh)
+        cat > /usr/share/$name/bandwidth.sh << 'EOF'
 #!/bin/bash
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
@@ -307,16 +701,17 @@ if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
     
     # Check if we got a valid result and if speed is below threshold
-    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
+    # Use awk instead of bc for better compatibility
+    if [[ -n "$DOWNLOAD_SPEED" ]] && awk "BEGIN {exit !($DOWNLOAD_SPEED < $MIN_BANDWIDTH)}"; then
         logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
         /sbin/reboot
     fi
 fi
 EOF
-        chmod +x /usr/share/$name/bandwith.sh
+        chmod +x /usr/share/$name/bandwidth.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
         success "Success installing $name"
-    elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version)" != "$ver" ]; then
+    elif [ "$(curl -s https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/version 2>/dev/null)" != "$ver" ]; then
         local name="hermavpn"
         curl -s -o /usr/share/$name/$name.sh https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/hermavpn.sh
         chmod 755 /usr/share/$name/*
@@ -325,7 +720,8 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        cat > /usr/share/$name/bandwith.sh << 'EOF'
+        # Fixed filename: bandwidth.sh (not bandwith.sh)
+        cat > /usr/share/$name/bandwidth.sh << 'EOF'
 #!/bin/bash
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
@@ -334,44 +730,59 @@ if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
     
     # Check if we got a valid result and if speed is below threshold
-    if [[ -n "$DOWNLOAD_SPEED" ]] && (( $(echo "$DOWNLOAD_SPEED < $MIN_BANDWIDTH" | bc -l 2>/dev/null || echo 0) )); then
+    # Use awk instead of bc for better compatibility
+    if [[ -n "$DOWNLOAD_SPEED" ]] && awk "BEGIN {exit !($DOWNLOAD_SPEED < $MIN_BANDWIDTH)}"; then
         logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
         /sbin/reboot
     fi
 fi
 EOF
-        chmod +x /usr/share/$name/bandwith.sh
+        chmod +x /usr/share/$name/bandwidth.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
         success "Success updating $name"
         bash /usr/share/$name/$name.sh
     fi
 }
 
-
+# Check arguments
 arguments()
 {
     if [ -z "$1" ]; then
-        error "sudo hermavpn \$endpoint \$entrypoint"
+        error "sudo hermavpn $endpoint $entrypoint"
     elif [ -z "$2" ]; then
-        error "sudo hermavpn \$endpoint \$entrypoint"
+        error "sudo hermavpn $endpoint $entrypoint"
     fi
 }
 
+main_menu()
+{
+    select opt in "Setup" "Endpoint" "Entrypoint" "Exit"
+    do
+        case $opt in
+            "Setup")
+                # main is now called unconditionally at the beginning of the script
+                ;;
+            "Endpoint")
+                arguments "$1" "$2"
+                info "Running Endpoint service..."
+                endpoint # Call the endpoint function
+                select_protocol "endpoint" # Pass the service type to select_protocol
+                ;;
+            "Entrypoint")
+                arguments "$1" "$2"
+                info "Running Entrypoint service..."
+                entrypoint # Call the entrypoint function
+                select_protocol "entrypoint" # Pass the service type to select_protocol
+                ;;
+            "Exit")
+                error "Exiting..."
+                break;;
+            *) echo "invalid option...";;
+        esac
+    done
+}
 
-logo
 main
+logo
 
-
-select opt in "Endpoint" "Entrypoint" Exit
-do
-    case $opt in
-        "Endpoint"|"Entrypoint")
-            arguments "$1" "$2"
-            info "Running $opt Tunnel..."
-            "${opt,,}";;
-        "Exit")
-            error "Exiting..."
-            break;;
-        *) echo "invalid option...";;
-    esac
-done
+main_menu "$ENTRYPOINT" "$ENDPOINT"

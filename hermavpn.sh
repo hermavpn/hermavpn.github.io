@@ -305,7 +305,7 @@ endpoint_udp()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "udp"
-token = "your_token" 
+token = "00980098" 
 connection_pool = 8
 aggressive_pool = false
 retry_interval = 3
@@ -376,7 +376,7 @@ entrypoint_wss()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wss"
-token = "your_token" 
+token = "00980098" 
 channel_size = 2048
 keepalive_period = 75 
 nodelay = true 
@@ -781,12 +781,9 @@ arguments()
 
 main_menu()
 {
-    select opt in "Setup" "Endpoint" "Entrypoint" "Exit"
+    select opt in "Endpoint" "Entrypoint" "Exit"
     do
         case $opt in
-            "Setup")
-                # main is now called unconditionally at the beginning of the script
-                ;;
             "Endpoint")
                 arguments "$1" "$2"
                 info "Running Endpoint service..."

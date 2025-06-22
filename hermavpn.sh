@@ -368,8 +368,9 @@ entrypoint_wss()
 {
     # generate certs
     openssl genpkey -algorithm RSA -out /usr/share/backhaul/server.key -pkeyopt rsa_keygen_bits:2048
-    openssl req -new -key /usr/share/backhaul/server.key \
-            -out /usr/share/backhaul/server.csr \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout /usr/share/backhaul/server.key \
+            -out /usr/share/backhaul/server.crt \
             -subj "/C=US/ST=California/L=San Francisco/O=Your Company Name/CN=example.com"
 
     cat > /usr/share/backhaul/config.toml << EOF
@@ -476,8 +477,9 @@ entrypoint_wssmux()
 {
     # generate certs
     openssl genpkey -algorithm RSA -out /usr/share/backhaul/server.key -pkeyopt rsa_keygen_bits:2048
-    openssl req -new -key /usr/share/backhaul/server.key \
-            -out /usr/share/backhaul/server.csr \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout /usr/share/backhaul/server.key \
+            -out /usr/share/backhaul/server.crt \
             -subj "/C=US/ST=California/L=San Francisco/O=Your Company Name/CN=example.com"
 
     cat > /usr/share/backhaul/config.toml << EOF

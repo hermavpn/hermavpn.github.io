@@ -718,23 +718,66 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        # Fixed filename: bandwidth.sh (not bandwith.sh)
-        cat > /usr/share/$name/bandwidth.sh << 'EOF'
+        cat > /usr/share/$name/bandwidth.sh << 'EOT'
 #!/bin/bash
+
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
-# Run the speed test and parse the download speed
+
+# Define a marker file to schedule restart if needed
+MARKER_FILE="/tmp/restart_scheduled"
+
+# Function to schedule reboot every 3 hours via systemd
+schedule_reboot() {
+    logger "Speedtest failed or not found. Scheduling reboot every 3 hours..."
+    
+    # Create systemd timer and service if not already created
+    cat <<EOF > /etc/systemd/system/periodic-reboot.service
+[Unit]
+Description=Periodic Reboot
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/reboot
+EOF
+
+    cat <<EOF > /etc/systemd/system/periodic-reboot.timer
+[Unit]
+Description=Reboot the machine every 3 hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=3h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+    # Enable and start the timer
+    systemctl daemon-reexec
+    systemctl daemon-reload
+    systemctl enable --now periodic-reboot.timer
+
+    # Mark it so we don’t keep re-writing
+    touch "$MARKER_FILE"
+}
+
+# Run speed test if available
 if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
     
-    # Check if we got a valid result and if speed is below threshold
-    # Use awk instead of bc for better compatibility
     if [[ -n "$DOWNLOAD_SPEED" ]] && awk "BEGIN {exit !($DOWNLOAD_SPEED < $MIN_BANDWIDTH)}"; then
         logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
         /sbin/reboot
     fi
+else
+    # Schedule reboot only once if speedtest not available
+    if [[ ! -f "$MARKER_FILE" ]]; then
+        schedule_reboot
+    fi
 fi
-EOF
+EOT
         chmod +x /usr/share/$name/bandwidth.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
         success "Success installing $name"
@@ -747,23 +790,66 @@ EOF
 cd /usr/share/$name;bash $name.sh "\$@"
 EOF
         chmod +x /usr/bin/$name
-        # Fixed filename: bandwidth.sh (not bandwith.sh)
-        cat > /usr/share/$name/bandwidth.sh << 'EOF'
+        cat > /usr/share/$name/bandwidth.sh << 'EOT'
 #!/bin/bash
+
 # Define the minimum acceptable bandwidth in Mbps
 MIN_BANDWIDTH=10
-# Run the speed test and parse the download speed
+
+# Define a marker file to schedule restart if needed
+MARKER_FILE="/tmp/restart_scheduled"
+
+# Function to schedule reboot every 3 hours via systemd
+schedule_reboot() {
+    logger "Speedtest failed or not found. Scheduling reboot every 3 hours..."
+    
+    # Create systemd timer and service if not already created
+    cat <<EOF > /etc/systemd/system/periodic-reboot.service
+[Unit]
+Description=Periodic Reboot
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/reboot
+EOF
+
+    cat <<EOF > /etc/systemd/system/periodic-reboot.timer
+[Unit]
+Description=Reboot the machine every 3 hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=3h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+    # Enable and start the timer
+    systemctl daemon-reexec
+    systemctl daemon-reload
+    systemctl enable --now periodic-reboot.timer
+
+    # Mark it so we don’t keep re-writing
+    touch "$MARKER_FILE"
+}
+
+# Run speed test if available
 if command -v speedtest-cli >/dev/null 2>&1; then
     DOWNLOAD_SPEED=$(timeout 60 speedtest-cli --simple 2>/dev/null | grep 'Download' | awk '{print $2}')
     
-    # Check if we got a valid result and if speed is below threshold
-    # Use awk instead of bc for better compatibility
     if [[ -n "$DOWNLOAD_SPEED" ]] && awk "BEGIN {exit !($DOWNLOAD_SPEED < $MIN_BANDWIDTH)}"; then
         logger "Bandwidth ($DOWNLOAD_SPEED Mbps) below threshold ($MIN_BANDWIDTH Mbps), rebooting..."
         /sbin/reboot
     fi
+else
+    # Schedule reboot only once if speedtest not available
+    if [[ ! -f "$MARKER_FILE" ]]; then
+        schedule_reboot
+    fi
 fi
-EOF
+EOT
         chmod +x /usr/share/$name/bandwidth.sh
         (crontab -l 2>/dev/null; echo "0 * * * * /usr/share/$name/bandwidth.sh") | crontab -
         success "Success updating $name"

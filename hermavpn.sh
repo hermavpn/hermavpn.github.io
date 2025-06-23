@@ -179,7 +179,7 @@ entrypoint_tcp()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "tcp"
 accept_udp = false
 token = "00980098"
@@ -204,7 +204,7 @@ endpoint_tcp()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "tcp"
 token = "00980098"
 connection_pool = 8
@@ -226,7 +226,7 @@ entrypoint_tcpmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "tcpmux"
 token = "00980098" 
 keepalive_period = 75
@@ -255,7 +255,7 @@ endpoint_tcpmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "tcpmux"
 token = "00980098" 
 connection_pool = 8
@@ -281,7 +281,7 @@ entrypoint_udp()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "udp"
 token = "00980098"
 heartbeat = 20 
@@ -303,7 +303,7 @@ endpoint_udp()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "udp"
 token = "00980098" 
 connection_pool = 8
@@ -322,7 +322,7 @@ entrypoint_ws()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "ws"
 token = "00980098" 
 channel_size = 2048
@@ -346,7 +346,7 @@ endpoint_ws()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "ws"
 token = "00980098" 
 connection_pool = 8
@@ -375,7 +375,7 @@ entrypoint_wss()
 
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "wss"
 token = "00980098" 
 channel_size = 2048
@@ -400,7 +400,7 @@ endpoint_wss()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "wss"
 token = "00980098" 
 connection_pool = 8
@@ -422,7 +422,7 @@ entrypoint_wsmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "wsmux"
 token = "00980098" 
 keepalive_period = 75
@@ -451,7 +451,7 @@ endpoint_wsmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "wsmux"
 token = "00980098" 
 connection_pool = 8
@@ -484,7 +484,7 @@ entrypoint_wssmux()
 
     cat > /usr/share/backhaul/config.toml << EOF
 [server]
-bind_addr = "0.0.0.0:8080"
+bind_addr = "0.0.0.0:2053"
 transport = "wssmux"
 token = "00980098" 
 keepalive_period = 75
@@ -515,7 +515,7 @@ endpoint_wssmux()
 {
     cat > /usr/share/backhaul/config.toml << EOF
 [client]
-remote_addr = "$IP_ENTRYPOINT:8080"
+remote_addr = "$IP_ENTRYPOINT:2053"
 transport = "wssmux"
 token = "00980098" 
 keepalive_period = 75

@@ -185,11 +185,11 @@ accept_udp = false
 token = "00980098"
 keepalive_period = 75
 nodelay = true
-heartbeat = 40
-channel_size = 2048
+heartbeat = 15
+channel_size = 16384
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -207,15 +207,15 @@ endpoint_tcp()
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcp"
 token = "00980098"
-connection_pool = 8
+connection_pool = 24
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
 nodelay = true
 retry_interval = 3
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -228,19 +228,19 @@ entrypoint_tcpmux()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "tcpmux"
-token = "00980098" 
+token = "00980098"
 keepalive_period = 75
-nodelay = true 
-heartbeat = 40 
-channel_size = 2048
-mux_con = 8
+nodelay = true
+heartbeat = 15
+channel_size = 16384
+mux_con = 40
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536 
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -257,20 +257,20 @@ endpoint_tcpmux()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "tcpmux"
-token = "00980098" 
-connection_pool = 8
+token = "00980098"
+connection_pool = 24
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
 retry_interval = 3
-nodelay = true 
+nodelay = true
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536 
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -284,11 +284,11 @@ entrypoint_udp()
 bind_addr = "0.0.0.0:8080"
 transport = "udp"
 token = "00980098"
-heartbeat = 20 
-channel_size = 2048
+heartbeat = 15
+channel_size = 16384
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -305,13 +305,13 @@ endpoint_udp()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "udp"
-token = "00980098" 
-connection_pool = 8
+token = "00980098"
+connection_pool = 24
 aggressive_pool = false
 retry_interval = 3
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -324,14 +324,14 @@ entrypoint_ws()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "ws"
-token = "00980098" 
-channel_size = 2048
-keepalive_period = 75 
-heartbeat = 40
-nodelay = true 
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+token = "00980098"
+channel_size = 16384
+keepalive_period = 75
+heartbeat = 15
+nodelay = true
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -348,16 +348,16 @@ endpoint_ws()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "ws"
-token = "00980098" 
-connection_pool = 8
+token = "00980098"
+connection_pool = 24
 aggressive_pool = false
-keepalive_period = 75 
+keepalive_period = 75
 dial_timeout = 10
 retry_interval = 3
-nodelay = true 
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+nodelay = true
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -377,15 +377,15 @@ entrypoint_wss()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wss"
-token = "00980098" 
-channel_size = 2048
-keepalive_period = 75 
-nodelay = true 
-tls_cert = "/usr/share/backhaul/server.crt"      
-tls_key = "/usr/share/backhaul//server.key"
+token = "00980098"
+channel_size = 16384
+keepalive_period = 75
+nodelay = true
+tls_cert = "/usr/share/backhaul/server.crt"
+tls_key = "/usr/share/backhaul/server.key"
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -402,16 +402,16 @@ endpoint_wss()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wss"
-token = "00980098" 
-connection_pool = 8
+token = "00980098"
+connection_pool = 24
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
-retry_interval = 3  
-nodelay = true 
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+retry_interval = 3
+nodelay = true
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -427,16 +427,16 @@ transport = "wsmux"
 token = "00980098" 
 keepalive_period = 75
 nodelay = true 
-heartbeat = 40 
-channel_size = 2048
-mux_con = 8
+heartbeat = 15
+channel_size = 16384
+mux_con = 40
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536 
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -453,20 +453,20 @@ endpoint_wsmux()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wsmux"
-token = "00980098" 
-connection_pool = 8
+token = "00980098"
+connection_pool = 24
 aggressive_pool = false
 keepalive_period = 75
 dial_timeout = 10
 nodelay = true
 retry_interval = 3
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536 
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul
@@ -486,21 +486,21 @@ entrypoint_wssmux()
 [server]
 bind_addr = "0.0.0.0:8080"
 transport = "wssmux"
-token = "00980098" 
+token = "00980098"
 keepalive_period = 75
-nodelay = true 
-heartbeat = 40 
-channel_size = 2048
-mux_con = 8
+nodelay = true
+heartbeat = 15
+channel_size = 16384
+mux_con = 40
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536 
-tls_cert = "/usr/share/backhaul/server.crt"      
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
+tls_cert = "/usr/share/backhaul/server.crt"
 tls_key = "/usr/share/backhaul/server.key"
-sniffer = false 
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer = false
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 ports = [
     "80=127.0.0.1:80",
     "443=127.0.0.1:443"
@@ -517,20 +517,20 @@ endpoint_wssmux()
 [client]
 remote_addr = "$IP_ENTRYPOINT:8080"
 transport = "wssmux"
-token = "00980098" 
+token = "00980098"
 keepalive_period = 75
 dial_timeout = 10
 nodelay = true
 retry_interval = 3
-connection_pool = 8
+connection_pool = 24
 aggressive_pool = false
 mux_version = 1
-mux_framesize = 32768 
-mux_recievebuffer = 4194304
-mux_streambuffer = 65536  
+mux_framesize = 65536
+mux_recievebuffer = 33554432
+mux_streambuffer = 131072
 sniffer = false
-sniffer_log = "/usr/share/backhaul/backhaul.json"
-log_level = "info"
+sniffer_log = "/usr/share/backhaul/log.json"
+log_level = "error"
 EOF
     success "Configuration Success $1"
     start_backhaul

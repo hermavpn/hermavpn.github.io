@@ -688,6 +688,9 @@ EOF
         fi
     fi
 
+    # Set Time Zone
+    timedatectl set-timezone Asia/Tehran
+
     # Initialize fail2ban
     if [ ! -f "/etc/fail2ban/jail.local" ]; then
         cat > /etc/fail2ban/jail.local << EOF

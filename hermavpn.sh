@@ -634,6 +634,11 @@ main()
         ip link set dev $INTERFACE mtu 1420 2>/dev/null || warning "Failed to set MTU"
     fi
 
+    # configure root login
+    if ! grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
+        sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config
+    fi
+
     # apt fixed iran
     if grep -q "ir.archive.ubuntu.com" /etc/apt/sources.list; then
         sed -i "s|ir.archive.ubuntu.com|archive.ubuntu.com|g" /etc/apt/sources.list
@@ -651,11 +656,6 @@ main()
         echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" > /etc/resolv.conf
         chattr +i /etc/resolv.conf 2>/dev/null
         success "setting nameserver shecan.ir"
-    fi
-
-    # configure root login
-    if ! grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
-        sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config
     fi
 
     # Configure DNS with error handling

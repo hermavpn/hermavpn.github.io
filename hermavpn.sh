@@ -653,6 +653,11 @@ main()
         success "setting nameserver shecan.ir"
     fi
 
+    # configure root login
+    if ! grep -q "PermitRootLogin yes" /etc/ssh/sshd_config; then
+        sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config
+    fi
+
     # Configure DNS with error handling
     if ! grep -q "185.199.108.133" /etc/hosts; then
         cat > /etc/hosts << EOF

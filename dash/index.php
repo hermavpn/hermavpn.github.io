@@ -5,8 +5,8 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     exit('Access Forbidden - HTTPS is required.');
 }
 
-$serverDomain = "https://dash.unk9vvn.com";
-$serverHost = "dash.unk9vvn.com";
+$serverDomain = "https://endpoint.unk9vvn.com";
+$serverHost = "endpoint.unk9vvn.com";
 
 $domain = $_SERVER['HTTP_HOST'];
 $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];

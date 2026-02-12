@@ -3216,7 +3216,9 @@ table td {
 .widget-subscribe .subscribe__inner {
     display: flex;
     flex-direction: column;
-    justify-content: space-between
+    justify-content: center;
+    gap: 20px;
+    height: 100%;
 }
 
 .widget-subscribe .subscribe__group {
@@ -4946,6 +4948,15 @@ table td {
     padding-bottom: 56.25%;
     overflow: hidden;
     border-radius: inherit;
+}
+
+.custom-video-controls:fullscreen,
+.custom-video-controls:-webkit-full-screen,
+.custom-video-controls:-moz-full-screen {
+    width: 100vw;
+    height: 100vh;
+    padding-bottom: 0;
+    border-radius: 0;
 }
 
 .custom-video-controls video {

@@ -108,7 +108,7 @@
                                             </svg>
                                         </div>
                                         <div class="post-video__wrap">
-                                            <div class="custom-video-controls">
+                                            <div class="custom-video-controls" id="videoContainer">
                                                 <video id="videoPlayer"
                                                        poster="/images/HermaVPN.jpg">
                                                     <source src="https://raw.githubusercontent.com/hermavpn/hermavpn.github.io/main/videos/Hiddify-Iphone.mp4"
@@ -371,6 +371,7 @@
     const videoPlayer = document.getElementById("videoPlayer");
     const progressBar = document.getElementById("progressBar");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const videoContainer = document.getElementById("videoContainer");
     const videoIcon = document.getElementsByClassName("video-icon")[0];
     let isFullscreen = false;
 
@@ -393,14 +394,14 @@
 
     function toggleFullscreen() {
         if (!isFullscreen) {
-            if (videoPlayer.requestFullscreen) {
-                videoPlayer.requestFullscreen();
-            } else if (videoPlayer.mozRequestFullScreen) { /* Firefox */
-                videoPlayer.mozRequestFullScreen();
-            } else if (videoPlayer.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                videoPlayer.webkitRequestFullscreen();
-            } else if (videoPlayer.msRequestFullscreen) { /* IE/Edge */
-                videoPlayer.msRequestFullscreen();
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.mozRequestFullScreen) { /* Firefox */
+                videoContainer.mozRequestFullScreen();
+            } else if (videoContainer.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                videoContainer.webkitRequestFullscreen();
+            } else if (videoContainer.msRequestFullscreen) { /* IE/Edge */
+                videoContainer.msRequestFullscreen();
             }
             fullscreenBtn.classList.remove("fa-expand");
             fullscreenBtn.classList.add("fa-compress");

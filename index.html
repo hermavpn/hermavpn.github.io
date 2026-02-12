@@ -23,9 +23,9 @@
 
 
     <!-- Ionicons -->
-    <link rel="preload" href="../unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" as="style">
+    <link rel="preload" href="unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" as="style">
 
-    <link href="../unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" rel="stylesheet">
+    <link href="unpkg.com/ionicons%404.5.0/dist/css/ionicons.min.css" rel="stylesheet">
 
     <script>
 
@@ -3251,7 +3251,9 @@
         .widget-subscribe .subscribe__inner {
             display: flex;
             flex-direction: column;
-            justify-content: space-between
+            justify-content: center;
+            gap: 20px;
+            height: 100%;
         }
 
         .widget-subscribe .subscribe__group {
@@ -3318,12 +3320,34 @@
         }
 
         @media (max-width: 768px) {
-            .footer__info .social {
+            .footer .footer__head .row {
+                justify-content: center;
+                align-items: center;
                 text-align: center;
             }
 
-            .footer__info .social .social__list {
-                justify-content: center;
+            .widget-subscribe,
+            .widget-recent {
+                text-align: center;
+            }
+
+            .widget-subscribe .subscribe-form {
+                height: auto;
+            }
+
+            .widget-subscribe .subscribe-form .subscribe-email {
+                border-radius: 40px;
+                margin-bottom: 10px;
+            }
+
+            .widget-subscribe .subscribe-form .subscribe-button {
+                position: static;
+                width: 100%;
+                margin-top: 5px;
+            }
+
+            .footer__info {
+                text-align: center;
             }
         }
 

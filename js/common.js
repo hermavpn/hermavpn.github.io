@@ -4,33 +4,13 @@ document.addEventListener("DOMContentLoaded", function() {
   var html = document.querySelector('html'),
     globalWrap = document.querySelector('.global-wrap'),
     body = document.querySelector('body'),
-    menuToggle = document.querySelector(".hamburger"),
-    menuList = document.querySelector(".main-nav"),
-    menuList = document.querySelector(".main-nav"),
     toggleTheme = document.querySelector(".toggle-theme"),
     btnScrollToTop = document.querySelector(".top");
 
 
   /* =======================================================
-  // Menu + Search + Theme Switcher
-  ======================================================= */
-  menuToggle.addEventListener("click", () => {
-    menu();
-  });
-
-  // Menu
-  function menu() {
-    menuToggle.classList.toggle("is-open");
-    menuList.classList.toggle("is-visible");
-  }
-
-  document.addEventListener('keydown', function(e){
-    if (e.key == 'Escape') {
-      searchClose();
-    }
-  });
-
   // Theme Switcher
+  ======================================================= */
   if (toggleTheme) {
     toggleTheme.addEventListener("click", () => {
       darkMode();
@@ -135,5 +115,47 @@ document.addEventListener("DOMContentLoaded", function() {
       })
     }
   });
+
+
+  /* =======================
+  // Custom Cursor (دو دایره رینگ – کلیک = دایره بیرونی بزرگ‌تر)
+  ======================= */
+  if (window.matchMedia && window.matchMedia("(pointer: fine)").matches) {
+    var cursorStyles = document.createElement("style");
+    cursorStyles.textContent =
+      ".has-custom-cursor, .has-custom-cursor * { cursor: none !important; }\n" +
+      ".custom-cursor { position: fixed; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 99999; }\n" +
+      ".custom-cursor__inner { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--brand-color, #ff009f); transform: translate(-50%, -50%); box-sizing: border-box; }\n" +
+      ".custom-cursor__outer { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--brand-color, #ff009f); transform: translate(-50%, -50%); box-sizing: border-box; transition: width 0.2s ease, height 0.2s ease; }\n" +
+      ".custom-cursor.is-pressed .custom-cursor__outer { width: 52px; height: 52px; }\n";
+    document.head.appendChild(cursorStyles);
+
+    var cursor = document.createElement("div");
+    cursor.className = "custom-cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    cursor.innerHTML = '<span class="custom-cursor__inner"></span><span class="custom-cursor__outer"></span>';
+    document.body.appendChild(cursor);
+
+    var curX = 0, curY = 0;
+    var inner = cursor.querySelector(".custom-cursor__inner");
+    var outer = cursor.querySelector(".custom-cursor__outer");
+
+    function moveCursor(e) {
+      curX = e.clientX;
+      curY = e.clientY;
+    }
+    function tick() {
+      if (inner) { inner.style.left = curX + "px"; inner.style.top = curY + "px"; }
+      if (outer) { outer.style.left = curX + "px"; outer.style.top = curY + "px"; }
+      requestAnimationFrame(tick);
+    }
+    document.addEventListener("mousemove", moveCursor, { passive: true });
+    requestAnimationFrame(tick);
+
+    document.addEventListener("mousedown", function () { cursor.classList.add("is-pressed"); });
+    document.addEventListener("mouseup", function () { cursor.classList.remove("is-pressed"); });
+
+    document.body.classList.add("has-custom-cursor");
+  }
 
 });

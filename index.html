@@ -16,10 +16,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap"
           as="style">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 
 
     <!-- Ionicons -->
@@ -97,30 +97,30 @@
         }
 
         @font-face {
-            font-family: 'IRANSans';
-            src: url('fonts/IRANSansX-Regular.ttf') format('truetype');
+            font-family: 'IRANYekan';
+            src: url('fonts/IRANYekanXFaNum-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
         }
 
         @font-face {
-            font-family: 'IRANSans-bold';
-            src: url('fonts/IRANSansX-Bold.ttf') format('truetype');
-        }
-
-        @font-face {
-            font-family: 'IRANSans-thin';
-            src: url('fonts/IRANSansX-Thin.ttf') format('truetype');
+            font-family: 'IRANYekan';
+            src: url('fonts/IRANYekanXFaNum-Bold.woff') format('woff');
+            font-weight: bold;
+            font-style: normal;
         }
 
         p, h1, h2, h3, h4, h5, h6, a, .subscribe-button, .subscribe__description, input {
-            font-family: 'IRANSans', sans-serif;
+            font-family: 'IRANYekan', 'Poppins', sans-serif;
         }
 
         .iran_bold {
-            font-family: 'IRANSans-bold', sans-serif;
+            font-family: 'IRANYekan', 'Poppins', sans-serif;
+            font-weight: bold;
         }
 
         .article__tag {
-            font-family: 'IRANSans-thin', sans-serif;
+            font-family: 'IRANYekan', 'Poppins', sans-serif;
         }
 
         .clearfix::after,
@@ -2619,7 +2619,7 @@
         }
 
         .logo__link {
-            font-family: "Inter", Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-family: "Poppins", "IRANYekan", Helvetica Neue, Helvetica, Arial, sans-serif;
             font-size: 20px;
             line-height: 1;
             font-weight: 700;
@@ -2643,103 +2643,7 @@
 
         @media (max-width: 1024px) {
             .main-nav {
-                position: absolute;
-                top: 60px;
-                right: 15px;
-                z-index: -1;
-                display: block;
-                width: auto;
-                min-width: 160px;
-                padding: 24px;
-                border-radius: 24px;
-                transform: translate3d(0, 10px, 0);
-                opacity: 0;
-                visibility: hidden;
-                background-color: var(--brand-color);
-                box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
-                transition: transform .25s ease, opacity .25s ease, visibility .25s ease
-            }
-
-            .main-nav.is-visible {
-                z-index: 100;
-                opacity: 1;
-                visibility: visible;
-                transform: translate3d(0, 0, 0)
-            }
-
-            .main-nav .nav__list {
-                flex-direction: column;
-                width: 100%
-            }
-
-            .main-nav .nav__list .nav__item {
-                display: block;
-                width: 100%;
-                padding: 0;
-                margin: 0
-            }
-
-            .main-nav .nav__list .nav__item.dropdown .dropdown-toggle {
-                display: none
-            }
-
-            .main-nav .nav__list .nav__item .dropdown-menu {
-                position: relative;
-                left: 0;
-                padding: 0;
-                opacity: 1;
-                visibility: visible;
-                transform: scale(1);
-                min-width: auto;
-                box-shadow: none
-            }
-
-            .main-nav .nav__list .nav__item .dropdown-menu .nav__link {
-                display: block;
-                padding: 8px 0;
-                margin: 0;
-                font-size: 16px;
-                line-height: 1
-            }
-
-            .main-nav .nav__list .nav__item .dropdown-menu .nav__link:last-child {
-                margin-bottom: 8px
-            }
-
-            .main-nav .nav__list .nav__item .nav__link {
-                display: block;
-                padding: 8px 0;
-                margin: 0;
-                font-size: 16px;
-                text-align: right;
-                font-weight: 500;
-                line-height: 1;
-                color: var(--white)
-            }
-
-            .main-nav .nav__list .nav__item .nav__link::before {
-                top: 0;
-                background-color: var(--white)
-            }
-
-            .main-nav .nav__list .nav__item .nav__link.active-link::before {
-                background-color: var(--white)
-            }
-
-            .main-nav .nav__list .nav__item .nav__link .arrow-down {
-                display: none
-            }
-
-            .main-nav .toggle-sun,
-            .main-nav .toggle-moon,
-            .main-nav .nav-buttons .icon__search {
-                color: var(--white)
-            }
-
-            .main-nav .toggle-sun:hover,
-            .main-nav .toggle-moon:hover,
-            .main-nav .nav-buttons .icon__search:hover {
-                color: var(--white)
+                margin-left: 0
             }
         }
 
@@ -2879,77 +2783,6 @@
         .nav-buttons .icon__menu:hover,
         .nav-buttons .icon__search:hover {
             color: var(--brand-color)
-        }
-
-        @media (max-width: 1024px) {
-            .nav-buttons {
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-                font-size: 21px
-            }
-
-            .nav-buttons .icon__menu {
-                display: block
-            }
-        }
-
-        .hamburger {
-            width: 24px;
-            height: 20px;
-            margin-left: auto;
-            display: none;
-            color: var(--link-color);
-            cursor: pointer
-        }
-
-        .hamburger:hover div,
-        .hamburger:hover div::after,
-        .hamburger:hover div::before {
-            background-color: var(--brand-color)
-        }
-
-        @media (max-width: 1024px) {
-            .hamburger {
-                display: flex;
-                align-items: center
-            }
-        }
-
-        .hamburger div,
-        .hamburger div::after,
-        .hamburger div::before {
-            width: 24px;
-            height: 3px;
-            border-radius: 10px;
-            transition: all 0.15s linear;
-            background-color: var(--heading-font-color)
-        }
-
-        .hamburger div::before,
-        .hamburger div::after {
-            content: "";
-            position: absolute
-        }
-
-        .hamburger div::before {
-            transform: translateY(-200%)
-        }
-
-        .hamburger div::after {
-            transform: translateY(200%)
-        }
-
-        .hamburger.is-open div {
-            background: transparent
-        }
-
-        .hamburger.is-open div::before {
-            transform: rotate(45deg)
-        }
-
-        .hamburger.is-open div::after {
-            transform: rotate(-45deg)
         }
 
         .toggle-theme {
@@ -3486,11 +3319,11 @@
 
         @media (max-width: 768px) {
             .footer__info .social {
-                text-align: left
+                text-align: center;
             }
 
             .footer__info .social .social__list {
-                justify-content: start
+                justify-content: center;
             }
         }
 
@@ -3717,7 +3550,7 @@
             display: inline-flex;
             align-items: center;
             margin-top: 20px;
-            padding-right: 12px;
+            padding: 14px 20px 14px 12px;
             font-size: 16px;
             line-height: 16px;
             font-weight: 700;
@@ -3725,12 +3558,13 @@
             color: var(--heading-font-color);
             outline: none;
             cursor: pointer;
-            transition: all 0.35s
+            transition: all 0.25s ease
         }
 
         .hero__left .hero__button:hover {
             color: var(--white);
-            background-color: var(--button-background-hover)
+            background-color: var(--button-background-hover);
+            padding: 16px 24px 16px 14px
         }
 
         .hero__left .hero__button .hero__button__arrow {
@@ -3740,14 +3574,33 @@
             margin-left: 10px;
             width: 30px;
             height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            padding: 0;
             border-radius: 8px;
             color: var(--white);
-            background: var(--brand-color)
+            background: var(--brand-color);
+            transition: all 0.25s ease
+        }
+
+        .hero__left .hero__button:hover .hero__button__arrow {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            min-height: 34px;
+            margin-left: 12px
         }
 
         @media (max-width: 768px) {
             .hero__left {
-                padding-right: 0
+                padding-right: 0;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center
+            }
+            .hero__left .hero__description {
+                text-align: center
             }
         }
 
@@ -4068,8 +3921,8 @@
 
         .section__title {
             margin-bottom: 0;
-            font-weight: 500;
-            font-family: 'IRANSans-bold', sans-serif;
+            font-family: 'IRANYekan', 'Poppins', sans-serif;
+            font-weight: bold;
         }
 
         .featured-post {
@@ -5060,10 +4913,6 @@
                         </a>
                     </div>
 
-                    <div class="hamburger">
-                        <div></div>
-                    </div>
-
                     <nav class="main-nav">
 
                         <div class="nav-buttons">
@@ -5417,46 +5266,6 @@
             <div class="container">
                 <div class="row">
                     <div class="col col-12">
-
-                        <div class="social">
-                            <ul class="social__list list-reset">
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://twitter.com/" target="_blank"
-                                       rel="noopener" aria-label="Twitter link"><i
-                                            class="ion-logo-twitter"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://github.com/" target="_blank"
-                                       rel="noopener" aria-label="Github link"><i class="ion-logo-github"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://youtube.com/" target="_blank"
-                                       rel="noopener" aria-label="Youtube link"><i
-                                            class="ion-logo-youtube"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://pinterest.com/" target="_blank"
-                                       rel="noopener" aria-label="Pinterest link"><i
-                                            class="ion-logo-pinterest"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://codepen.io/" target="_blank"
-                                       rel="noopener" aria-label="Codepen link"><i
-                                            class="ion-logo-codepen"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://vimeo.com/" target="_blank" rel="noopener"
-                                       aria-label="Vimeo link"><i class="ion-logo-vimeo"></i></a>
-                                </li>
-
-                            </ul>
-                        </div>
 
                         <div class="copyright">طراحی شده توسط تیم فیلترشکن هرما <a href="https://t.me/HermaVPN_BoT">HermaVPN</a></div>
                     </div>

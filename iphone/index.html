@@ -17,10 +17,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap"
           as="style">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 
 
     <!-- Ionicons -->
@@ -64,10 +64,14 @@
                         </a>
                     </div>
 
-                    <div class="hamburger">
-                        <div></div>
-                    </div>
-
+                    <nav class="main-nav">
+                        <div class="nav-buttons">
+                            <div class="toggle-theme">
+                                <div class="toggle-moon" title="Enable dark mode" aria-hidden="true"><i class="ion ion-ios-moon"></i></div>
+                                <div class="toggle-sun" title="Enable light mode" aria-hidden="true"><i class="ion ion-ios-sunny"></i></div>
+                            </div>
+                        </div>
+                    </nav>
 
                 </div>
             </div>
@@ -233,80 +237,6 @@
                 </div>
 
 
-                <div class="row spacer-top">
-                    <div class="col-md-12">
-                        <h3>اشتراک این صفحه در شبکه اجتماعی</h3>
-                    </div>
-                </div>
-                <div class="post__share">
-                    <ul class="share__list list-reset">
-                        <li class="share__item">
-                            <a class="share__link share__twitter"
-                               href="https://twitter.com/intent/tweet?text=https://hermavpn.github.io"
-                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
-                               title="Share on Twitter" rel="nofollow"><i class="ion ion-logo-twitter"></i></a>
-                        </li>
-                        <li class="share__item">
-                            <a class="share__link share__facebook"
-                               href="https://www.facebook.com/sharer/sharer.php?u=https://hermavpn.github.io"
-                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
-                               title="Share on Facebook" rel="nofollow"><i class="ion ion-logo-facebook"></i></a>
-                        </li>
-                        <li class="share__item">
-                            <a class="share__link share__pinterest"
-                               href="http://pinterest.com/pin/create/button/?url=https://hermavpn.github.io"
-                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
-                               title="Share on Pinterest" rel="nofollow"><i class="ion ion-logo-pinterest"></i></a>
-                        </li>
-                        <li class="share__item">
-                            <a class="share__link share__linkedin"
-                               href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://hermavpn.github.io"
-                               onclick="window.open(this.href, 'pop-up', 'right=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
-                               title="Share on LinkedIn" rel="nofollow"><i class="ion ion-logo-linkedin"></i></a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- begin comments -->
-                <div class="show-comments">
-                    <button class="button button--rounded disqus-button" id="show-comments-button"
-                            onclick="disqus();return false;">نمایش نظرات
-                    </button>
-                </div>
-
-                <div id="disqus_thread" class="post__comments">
-                    <div id="disqus_empty"></div>
-                </div>
-
-                <script>
-                    var disqus_loaded = false;
-                    var disqus_shortname = 'anvod-studio-test';
-                    var disqus_container = document.getElementById("disqus_thread");
-
-                    function disqus() {
-                        if (!disqus_loaded) {
-                            disqus_loaded = true;
-                            var e = document.createElement("script");
-                            e.type = "text/javascript";
-                            e.async = true;
-                            e.src = "//" + disqus_shortname + ".disqus.com/embed.js";
-                            (document.getElementsByTagName("head")[0] ||
-                                document.getElementsByTagName("body")[0])
-                                .appendChild(e);
-                            // Hide the button after opening
-                            document.getElementById("show-comments-button").style.display = "none";
-                            // Show disqus comments
-                            disqus_container.classList.add("is-open");
-                        }
-                    }
-                </script>
-
-                <noscript>Please enable JavaScript to view the
-                    <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
-                </noscript>
-                <!-- end comments -->
-
-
             </article>
         </div>
         <!-- end post -->
@@ -424,46 +354,6 @@
                 <div class="row">
                     <div class="col col-12">
 
-                        <div class="social">
-                            <ul class="social__list list-reset">
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://twitter.com/" target="_blank"
-                                       rel="noopener" aria-label="Twitter link"><i
-                                            class="ion-logo-twitter"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://github.com/" target="_blank"
-                                       rel="noopener" aria-label="Github link"><i class="ion-logo-github"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://youtube.com/" target="_blank"
-                                       rel="noopener" aria-label="Youtube link"><i
-                                            class="ion-logo-youtube"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://pinterest.com/" target="_blank"
-                                       rel="noopener" aria-label="Pinterest link"><i
-                                            class="ion-logo-pinterest"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://codepen.io/" target="_blank"
-                                       rel="noopener" aria-label="Codepen link"><i
-                                            class="ion-logo-codepen"></i></a>
-                                </li>
-
-                                <li class="social__item">
-                                    <a class="social__link" href="https://vimeo.com/" target="_blank" rel="noopener"
-                                       aria-label="Vimeo link"><i class="ion-logo-vimeo"></i></a>
-                                </li>
-
-                            </ul>
-                        </div>
-
                         <div class="copyright">طراحی شده توسط تیم فیلترشکن هرما <a href="tg://HermaVPN_BoT">HermaVPN</a>
                         </div>
                     </div>
@@ -484,15 +374,21 @@
     const videoIcon = document.getElementsByClassName("video-icon")[0];
     let isFullscreen = false;
 
-    videoPlayer.addEventListener("click", toggleVideoControls);
+    videoPlayer.addEventListener("click", togglePlayPause);
+    videoIcon.addEventListener("click", togglePlayPause);
     fullscreenBtn.addEventListener("click", toggleFullscreen);
 
-    function toggleVideoControls() {
-        videoPlayer.controls = !videoPlayer.controls;
-        if (videoPlayer.controls) {
+    function togglePlayPause() {
+        if (videoPlayer.paused) {
+            videoPlayer.play();
+            videoPlayer.controls = true;
             progressBar.style.width = "0";
+            if (videoIcon) {
+                videoIcon.remove();
+            }
+        } else {
+            videoPlayer.pause();
         }
-        videoIcon.remove();
     }
 
     function toggleFullscreen() {

@@ -2257,19 +2257,19 @@ ol li {
 
 @keyframes pulse {
     0% {
-        transform: scale(1, 1)
+        transform: translate(-50%, -50%) scale(1, 1)
     }
 
     25% {
-        transform: scale(1, 1)
+        transform: translate(-50%, -50%) scale(1, 1)
     }
 
     50% {
-        transform: scale(1.2, 1.2)
+        transform: translate(-50%, -50%) scale(1.2, 1.2)
     }
 
     100% {
-        transform: scale(1, 1)
+        transform: translate(-50%, -50%) scale(1, 1)
     }
 }
 
@@ -3091,13 +3091,62 @@ table td {
 
     .footer .footer__head {
         margin: 0;
-        padding: 0;
+        padding: 32px 24px;
         box-shadow: none
+    }
+
+    .footer .footer__head .row {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer .footer__head .row .col {
+        max-width: 420px;
+        width: 100%;
+        margin-bottom: 40px;
+    }
+
+    .footer .footer__head .row .col:last-child {
+        margin-bottom: 0;
+    }
+
+    .widget-subscribe,
+    .widget-recent {
+        text-align: center;
+    }
+
+    .widget-subscribe .subscribe-form {
+        height: auto;
+    }
+
+    .widget-subscribe .subscribe-form .subscribe-email {
+        border-radius: 40px;
+        margin-bottom: 10px;
+    }
+
+    .widget-subscribe .subscribe-form .subscribe-button {
+        position: static;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .footer .widget-recent .recent-posts {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer .widget-recent .recent-posts__image {
+        margin-left: 0;
+        margin-bottom: 10px;
     }
 
     .footer .footer__info {
         padding-top: 40px;
-        border-top: 1px solid var(--border-alt-color)
+        border-top: 1px solid var(--border-alt-color);
+        text-align: center;
     }
 }
 
@@ -3300,6 +3349,7 @@ table td {
     margin-top: 15px;
     font-size: 13px;
     font-weight: 500;
+    font-family: 'IRANYekan', 'Poppins', sans-serif;
     text-align: center;
     color: var(--text-alt-color)
 }
@@ -3318,7 +3368,7 @@ table td {
 
 @media (max-width: 768px) {
     .copyright {
-        text-align: right
+        text-align: center
     }
 }
 
@@ -3373,7 +3423,7 @@ table td {
 
 .hero.hero-video .hero__right {
     width: 100%;
-    max-width: 780px;
+    max-width: 960px;
     margin-top: 40px;
     padding-right: 0;
     margin-left: auto;
@@ -3395,17 +3445,29 @@ table td {
     }
 
     .hero.hero-video .hero__right {
-        margin: 0 auto 20px
+        margin: 0 auto 20px;
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     .hero.hero-video .hero__right {
         order: 0
+    }
+
+    .hero.hero-video .post-video {
+        width: 100%;
+        max-width: 100%;
     }
 }
 
 @media (max-width: 576px) {
     .hero {
         padding: 40px 0
+    }
+
+    .hero.hero-video .hero__right {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 }
 
@@ -3726,24 +3788,24 @@ table td {
 
 .video-icon .circle {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     z-index: -1;
     width: 72px;
     height: 72px;
     border-radius: 50%;
     overflow: hidden;
-    margin: auto;
-    transform: scale(1, 1)
+    margin: 0;
+    transform: translate(-50%, -50%) scale(1, 1);
+    transform-origin: center center;
 }
 
 .video-icon .circle.pulse {
     animation-timing-function: ease;
     animation: pulse 2s infinite;
     opacity: .5;
-    background-color: var(--brand-color)
+    background-color: var(--brand-color);
+    transform-origin: center center;
 }
 
 .video-icon svg {
@@ -4188,8 +4250,11 @@ table td {
     }
 }
 
-.post-video{
-    width: 92%;
+.post-video {
+    width: 100%;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .post-video,
@@ -5003,6 +5068,15 @@ table td {
     font-size: 18px;
     transition: background 0.2s ease, color 0.2s ease;
     z-index: 2;
+    padding: 0;
+    line-height: 1;
+    text-align: center;
+}
+
+.fullscreen-btn::before {
+    display: block;
+    text-align: center;
+    line-height: 1;
 }
 
 .fullscreen-btn:hover {

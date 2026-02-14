@@ -3119,17 +3119,22 @@ table td {
 
     .widget-subscribe .subscribe-form {
         height: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .widget-subscribe .subscribe-form .subscribe-email {
         border-radius: 40px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        height: auto;
+        min-height: 48px;
+        position: relative;
     }
 
     .widget-subscribe .subscribe-form .subscribe-button {
         position: static;
         width: 100%;
-        margin-top: 5px;
+        margin-top: 0;
     }
 
     .footer .widget-recent .recent-posts {
@@ -4255,6 +4260,7 @@ table td {
     max-width: 960px;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
 }
 
 .post-video,
@@ -5058,7 +5064,7 @@ table td {
     right: 12px;
     width: 40px;
     height: 40px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     color: rgba(255, 255, 255, 0.95);
